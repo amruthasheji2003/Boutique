@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const Wishlist = () => {
   const [wishlistItems, setWishlistItems] = useState([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const storedWishlist = JSON.parse(localStorage.getItem('wishlist')) || [];
@@ -37,6 +39,15 @@ const Wishlist = () => {
           ))}
         </ul>
       )}
+      {/* Back button at the bottom of the page */}
+      <div className="flex justify-center mt-6">
+        <button 
+          onClick={() => navigate(-1)} 
+          className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600"
+        >
+          Back
+        </button>
+      </div>
     </div>
   );
 };

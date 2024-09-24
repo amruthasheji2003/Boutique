@@ -69,6 +69,14 @@ const BrowseCatalog = () => {
 
   return (
     <div className="catalog-container p-6">
+      {/* Back Button */}
+      <button
+        className="absolute top-4 right-4 bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600"
+        onClick={() => navigate('/customer')}
+      >
+        Back
+      </button>
+
       <h1 className="text-4xl font-bold text-center mb-6">Browse Catalog</h1>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {catalogItems.map((item) => (
@@ -114,7 +122,7 @@ const BrowseCatalog = () => {
           className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600"
           onClick={() => navigate('/customer')}
         >
-          Back to Customer Page
+          Back 
         </button>
       </div>
     </div>

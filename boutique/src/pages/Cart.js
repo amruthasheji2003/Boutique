@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const Cart = () => {
   const [cartItems, setCartItems] = useState([]);
+  const navigate = useNavigate(); // Initialize useNavigate
 
   useEffect(() => {
     const storedCart = JSON.parse(localStorage.getItem('cart')) || [];
@@ -20,6 +22,12 @@ const Cart = () => {
 
   return (
     <div className="cart-container p-6">
+      <button 
+        onClick={() => navigate('/customer')} // Redirect to customer page
+        className="mb-4 bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600"
+      >
+        Back
+      </button>
       <h1 className="text-4xl font-bold text-center mb-6">Your Cart</h1>
       {cartItems.length === 0 ? (
         <p className="text-center">Your cart is empty!</p>

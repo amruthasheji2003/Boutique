@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Card, Button, Typography, Box } from '@mui/material';
+import { Card, Button, Typography, Box, AppBar, Toolbar, Tabs, Tab } from '@mui/material';
 
 const CustomDressOrder = () => {
   const navigate = useNavigate();
@@ -8,6 +8,7 @@ const CustomDressOrder = () => {
   const [selectedFabric, setSelectedFabric] = useState(null);
   const [selectedColor, setSelectedColor] = useState(null);
   const [selectedStyle, setSelectedStyle] = useState(null);
+  const [value, setValue] = useState(0);
 
   useEffect(() => {
     if (location.state) {
@@ -19,12 +20,31 @@ const CustomDressOrder = () => {
 
   const handleNavigate = (page) => navigate(page);
 
+  const handleTabChange = (event, newValue) => {
+    setValue(newValue);
+    switch (newValue) {
+      case 0:
+        handleNavigate('/fabric-selection');
+        break;
+      case 1:
+        handleNavigate('/color-selection');
+        break;
+      case 2:
+        handleNavigate('/dress-style-selection');
+        break;
+      case 3:
+        handleNavigate('/measurements-input');
+        break;
+      default:
+        break;
+    }
+  };
+
   const handleSubmit = () => alert("Order has been placed!");
 
   return (
     <Box
       sx={{
-        padding: 4,
         fontFamily: "'Roboto', sans-serif",
         backgroundImage: `url(${require('../assets/bg1.jpg')})`,
         backgroundSize: 'cover',
@@ -32,7 +52,6 @@ const CustomDressOrder = () => {
         minHeight: '100vh',
         display: 'flex',
         flexDirection: 'column',
-        alignItems: 'center',
         position: 'relative',
         '&::before': {
           content: '""',
@@ -47,11 +66,30 @@ const CustomDressOrder = () => {
         zIndex: 2,
       }}
     >
-      <Box sx={{ zIndex: 3, maxWidth: '600px', width: '100%' }}>
-        <Typography variant="h4" align="center" sx={{ color: '#fff', mb: 4 }}>
-          Customize Your Dress
-        </Typography>
+      {/* Header with Navigation Tabs */}
+      <AppBar position="static" sx={{ backgroundColor: '#ffffffaa', zIndex: 3 }}>
+        <Toolbar>
+          <Typography variant="h6" sx={{ flexGrow: 1 }}>
+            Customize Your Dress
+          </Typography>
+          <Tabs
+            value={value}
+            onChange={handleTabChange}
+            textColor="inherit"
+            indicatorColor="secondary"
+            aria-label="navigation tabs"
+            sx={{ color: '#000' }}
+          >
+            <Tab label="Fabric Selection" />
+            <Tab label="Color Selection" />
+            <Tab label="Dress Style" />
+            <Tab label="Measurements" />
+          </Tabs>
+        </Toolbar>
+      </AppBar>
 
+      {/* Main Content */}
+      <Box sx={{ zIndex: 3, maxWidth: '600px', width: '100%', margin: 'auto', padding: 4 }}>
         {selectedFabric && (
           <Card sx={{ padding: 2, mb: 2, backgroundColor: '#ffffffaa' }}>
             <Typography variant="h6">Fabric Selected: {selectedFabric.name}</Typography>
@@ -72,55 +110,8 @@ const CustomDressOrder = () => {
           </Card>
         )}
 
-        <Card sx={{ padding: 2, mb: 2 }}>
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={() => handleNavigate('/fabric-selection')}
-            fullWidth
-            sx={{ padding: '10px', fontSize: '14px' }}
-          >
-            Fabric Selection
-          </Button>
-        </Card>
-
-        <Card sx={{ padding: 2, mb: 2 }}>
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={() => handleNavigate('/color-selection')}
-            fullWidth
-            sx={{ padding: '10px', fontSize: '14px' }}
-          >
-            Color Selection
-          </Button>
-        </Card>
-
-        <Card sx={{ padding: 2, mb: 2 }}>
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={() => handleNavigate('/dress-style-selection')}
-            fullWidth
-            sx={{ padding: '10px', fontSize: '14px' }}
-          >
-            Dress Style Selection
-          </Button>
-        </Card>
-
-        <Card sx={{ padding: 2, mb: 2 }}>
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={() => handleNavigate('/measurements-input')}
-            fullWidth
-            sx={{ padding: '10px', fontSize: '14px' }}
-          >
-            Measurements Input
-          </Button>
-        </Card>
-
-        <Card sx={{ padding: 2 }}>
+        {/* Place Order Button */}
+        <Card sx={{ padding: 2, mt: 4 }}>
           <Button
             variant="contained"
             color="secondary"

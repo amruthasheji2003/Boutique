@@ -4,7 +4,6 @@ import Home from '../pages/Home';
 import Login from '../pages/Login';
 import Customer from '../pages/Customer';
 import Registration from '../pages/Registration';
-import Editprofile from '../pages/Editprofile';
 import FeaturedProducts from '../pages/FeaturedProducts'; // Fixed the casing here
 import ContactUs from '../pages/ContactUs';
 import PlaceOrder from '../pages/PlaceOrder';
@@ -16,7 +15,11 @@ import Wishlist from '../pages/Wishlist';
 import Cart from '../pages/Cart';
 import DressStyleSelection from '../pages/DressStyleSelection';
 import ForgotPassword from '../pages/ForgotPassword';
-
+import CreateProfile from '../pages/CreateProfile';
+import AdminPage from '../pages/AdminPage';
+import ManageVendors from '../pages/ManageVendors';
+import UserTable from '../pages/UserTable';
+import AddProduct from '../pages/Addproduct';
 const router = createBrowserRouter([
     {
         path : "/",
@@ -39,8 +42,8 @@ const router = createBrowserRouter([
                 element : <Registration/>
             },
             {
-                path : "editprofile",
-                element : <Editprofile/>
+                path : "createprofile",
+                element : <CreateProfile/>
             },
             {
                 path : "featured-products",
@@ -86,7 +89,22 @@ const router = createBrowserRouter([
                 path : "forgot-password",
                 element : <ForgotPassword/>
             },
-            
+            {
+                path : "adminpage",
+                element : <AdminPage/>
+            },
+            {
+                path : "admin/vendors",
+                element : <ManageVendors/>
+            },
+            {
+                path : "admin/UserTable",
+                element : <UserTable/>
+            },
+            {
+                path : "admin/products",
+                element : <AddProduct/>
+            }
             // Other routes...
         ]
     }

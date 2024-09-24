@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-const EditProfile = () => {
+const CreateProfile = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     firstname: '',
@@ -15,6 +15,7 @@ const EditProfile = () => {
     address: '',
     postalcode: '',
   });
+  const [error, setError] = useState(''); // To capture any errors
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -24,16 +25,44 @@ const EditProfile = () => {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Profile updated:', formData);
-    // Navigate to customer page after saving changes
-    navigate('/customer'); // Navigate to the customer page
+    setError(''); // Clear any previous errors
+
+    try {
+      const response = await fetch('/api/Profile', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-auth-token': localStorage.getItem('token'), // Include token if necessary
+        },
+        body: JSON.stringify(formData),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to create profile');
+      }
+
+      const result = await response.json();
+      console.log('Profile created:', result);
+      navigate('/customer');
+    } catch (err) {
+      setError(err.message);
+      console.error('Error creating profile:', err);
+    }
+  };
+
+  const handleBackClick = () => {
+    navigate(-1); // Go back to the previous page
   };
 
   return (
     <div style={styles.container}>
-      <h1 style={styles.heading}>Edit Profile</h1>
+      <button onClick={handleBackClick} style={styles.backButton}>
+        &#8592; Back
+      </button>
+      <h1 style={styles.heading}>Create Profile</h1>
+      {error && <p style={styles.error}>{error}</p>} {/* Display error message */}
       <form onSubmit={handleSubmit} style={styles.form}>
         <div style={styles.partitions}>
           <div style={styles.partition}>
@@ -71,7 +100,7 @@ const EditProfile = () => {
               <div key={key} style={styles.formGroup}>
                 <label style={styles.label}>{formatLabel(key)}:</label>
                 <input
-                  type={key === 'email' ? 'email' : 'text'}
+                  type="text"
                   name={key}
                   value={formData[key]}
                   onChange={handleChange}
@@ -106,10 +135,25 @@ const styles = {
     boxSizing: 'border-box',
     backdropFilter: 'blur(5px)', // Add a blur effect for better readability
   },
+  backButton: {
+    position: 'absolute', // Position the button absolutely
+    top: '20px', // Set it to the top
+    left: '20px', // Set it to the left
+    fontSize: '16px',
+    fontWeight: 'bold',
+    textDecoration: 'none',
+    border: 'none',
+    background: 'none', // No background color
+    color: '#333', // Dark color for the back button
+    cursor: 'pointer',
+  },
   heading: {
     fontSize: '2rem',
     marginBottom: '20px',
     color: '#fff', // Changed to white for contrast
+  },
+  error: {
+    color: 'red', // Style for error messages
   },
   form: {
     display: 'flex',
@@ -162,4 +206,4 @@ const styles = {
   },
 };
 
-export default EditProfile;
+export default CreateProfile;

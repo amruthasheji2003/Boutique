@@ -7,18 +7,16 @@ const Login = () => {
   const [password, setPassword] = useState('');
   const [emailError, setEmailError] = useState('');
   const [passwordError, setPasswordError] = useState('');
-  const [successMessage, setSuccessMessage] = useState(''); // State for success message
+  const [successMessage, setSuccessMessage] = useState('');
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
-    // Reset errors and success message
     setEmailError('');
     setPasswordError('');
     setSuccessMessage('');
-  
-    // Basic validation
+
+    // Validate inputs
     let valid = true;
     if (!email) {
       setEmailError('Email is required.');
@@ -28,9 +26,16 @@ const Login = () => {
       setPasswordError('Password is required.');
       valid = false;
     }
-  
+
     if (!valid) return;
-  
+
+    // Check for admin credentials
+    if (email === 'admin@gmail.com' && password === 'Admin@2025') {
+      navigate('/adminpage'); // Correctly navigate to the admin page
+      return; // Prevent further execution
+    }
+
+    // Attempt login for regular users
     try {
       const response = await fetch('http://localhost:8080/api/auth/login', {
         method: 'POST',
@@ -39,17 +44,16 @@ const Login = () => {
         },
         body: JSON.stringify({ email, password }),
       });
-  
+
       const data = await response.json();
-  
+
       if (response.status === 200) {
         console.log('Login successful', data);
-        // Save token to localStorage
-        localStorage.setItem('token', data.token); // Assuming the token is returned in the response
+        localStorage.setItem('token', data.token);
         setSuccessMessage('Login successful! Redirecting...');
         setTimeout(() => {
           navigate('/Customer');
-        }, 2000); // Redirect after 2 seconds
+        }, 2000);
       } else {
         setEmailError(data.message || 'Login failed');
       }
@@ -58,7 +62,6 @@ const Login = () => {
       setEmailError('An error occurred. Please try again.');
     }
   };
-  
 
   const handleGoogleSignIn = () => {
     console.log('Google Sign-In clicked');
@@ -68,18 +71,39 @@ const Login = () => {
     navigate('/forgot-password');
   };
 
+  const handleBackButtonClick = () => {
+    navigate('/'); // Navigate to the home page
+  };
+
   return (
     <div>
-      {/* Small rectangular notification box */}
+      {/* Header Section */}
+      <header className='h-16 shadow-md bg-yellow-900 fixed w-full z-40'>
+        <div className='h-full container mx-auto flex items-center px-4 justify-between'>
+          <div className='flex items-center gap-4'>
+            <Link to="/" className='text-green text-2xl font-bold hover:text-pink-100 transition-colors duration-300'>
+              Tailor's Touch Boutique
+            </Link>
+            <nav className='hidden lg:flex items-center space-x-40 ml-20'>
+              <Link to="/" className='text-white text-lg hover:text-blue-300 transition-colors duration-300'>Home</Link>
+              <Link to="/featured-products" className='text-white text-lg hover:text-blue-300 transition-colors duration-300'>Featured Products</Link>
+              <Link to="/contact-us" className='text-white text-lg hover:text-blue-300 transition-colors duration-300'>Contact Us</Link>
+            </nav>
+          </div>
+          {/* Back Button */}
+          <button onClick={handleBackButtonClick} className='text-white ml-4'>
+            Back
+          </button>
+        </div>
+      </header>
+
       {successMessage && (
         <div style={styles.notificationBox}>
           <p style={styles.notificationMessage}>{successMessage}</p>
         </div>
       )}
 
-      <div
-        style={{ ...styles.container, backgroundImage: `url(${backgroundImage})` }}
-      >
+      <main className='min-h-[calc(100vh-60px)] pt-0' style={{ ...styles.container, backgroundImage: `url(${backgroundImage})` }}>
         <div style={styles.formContainer}>
           <h2 style={styles.heading}>Login</h2>
           <form onSubmit={handleSubmit} style={styles.form}>
@@ -112,7 +136,7 @@ const Login = () => {
             <button type="submit" style={styles.button}>Login</button>
           </form>
 
-          <button onClick={handleGoogleSignIn} style={{ ...styles.googleButton, width: '100%' }}>
+          <button onClick={handleGoogleSignIn} style={styles.googleButton}>
             Sign in with Google
           </button>
           <p onClick={handleForgotPassword} style={styles.forgotPassword}>
@@ -122,7 +146,7 @@ const Login = () => {
             Sign Up
           </Link>
         </div>
-      </div>
+      </main>
     </div>
   );
 };
@@ -132,7 +156,6 @@ const styles = {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    height: '100vh',
     backgroundSize: 'cover',
     backgroundPosition: 'center',
     backgroundRepeat: 'no-repeat',
