@@ -34,6 +34,7 @@ const registerUser = async (req, res) => {
 };
 
 // Login user
+
 const loginUser = async (req, res) => {
   const { email, password } = req.body;
 
@@ -55,11 +56,25 @@ const loginUser = async (req, res) => {
       expiresIn: '1h',
     });
 
-    res.status(200).json({ message: 'Login successful', token });
+    // Set the token in an HTTP-only cookie (for security)
+    res.cookie('token', token, {
+      httpOnly: true,   // Protect against XSS
+      secure: process.env.NODE_ENV === 'production', // Only send over HTTPS in production
+      sameSite: 'Strict',
+      maxAge: 3600000   // 1 hour expiration
+    });
+
+    res.status(200).json({ message: 'Login successful' });
   } catch (error) {
     console.error('Error during login:', error);
     res.status(500).json({ message: 'Login failed', error: error.message });
   }
 };
 
-module.exports = { registerUser, loginUser };
+// Logout user (clear token)
+const logoutUser = (req, res) => {
+  res.clearCookie('token');  // Remove the JWT token
+  res.status(200).json({ message: 'Logout successful' });
+};
+
+module.exports = { registerUser, loginUser, logoutUser };
