@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Card, Button, Typography, Box, AppBar, Toolbar, Tabs, Tab } from '@mui/material';
+import { Card, Button, Typography, Box, AppBar, Toolbar, Tabs, Tab, IconButton } from '@mui/material';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
 const CustomDressOrder = () => {
   const navigate = useNavigate();
@@ -40,7 +41,7 @@ const CustomDressOrder = () => {
     }
   };
 
-  const handleSubmit = () => alert("Order has been placed!");
+  const handleSubmit = () => alert('Order has been placed!');
 
   return (
     <Box
@@ -66,9 +67,18 @@ const CustomDressOrder = () => {
         zIndex: 2,
       }}
     >
-      {/* Header with Navigation Tabs */}
+      {/* Header with Back Button and Navigation Tabs */}
       <AppBar position="static" sx={{ backgroundColor: '#ffffffaa', zIndex: 3 }}>
         <Toolbar>
+          <IconButton
+            edge="start"
+            color="inherit"
+            aria-label="back"
+            onClick={() => navigate(-1)}
+            sx={{ mr: 2, color: '#ff3e6c' }}
+          >
+            <ArrowBackIcon />
+          </IconButton>
           <Typography variant="h6" sx={{ flexGrow: 1 }}>
             Customize Your Dress
           </Typography>
@@ -91,48 +101,44 @@ const CustomDressOrder = () => {
       {/* Main Content */}
       <Box sx={{ zIndex: 3, maxWidth: '600px', width: '100%', margin: 'auto', padding: 4 }}>
         {selectedFabric && (
-          <Card sx={{ padding: 2, mb: 2, backgroundColor: '#ffffffaa' }}>
-            <Typography variant="h6">Fabric Selected: {selectedFabric.name}</Typography>
+          <Card sx={{ padding: 2, mb: 2, backgroundColor: '#ffffffaa', borderRadius: '10px', boxShadow: 3 }}>
+            <Typography variant="h6" sx={{ fontWeight: 'bold' }}>Fabric Selected: {selectedFabric.name}</Typography>
           </Card>
         )}
 
         {selectedColor && (
-          <Card sx={{ padding: 2, mb: 2, backgroundColor: '#ffffffaa' }}>
-            <Typography variant="h6">
+          <Card sx={{ padding: 2, mb: 2, backgroundColor: '#ffffffaa', borderRadius: '10px', boxShadow: 3 }}>
+            <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
               Color Selected: <span style={{ color: selectedColor }}>● {selectedColor}</span>
             </Typography>
           </Card>
         )}
 
         {selectedStyle && (
-          <Card sx={{ padding: 2, mb: 2, backgroundColor: '#ffffffaa' }}>
-            <Typography variant="h6">Dress Style Selected: {selectedStyle.name}</Typography>
+          <Card sx={{ padding: 2, mb: 2, backgroundColor: '#ffffffaa', borderRadius: '10px', boxShadow: 3 }}>
+            <Typography variant="h6" sx={{ fontWeight: 'bold' }}>Dress Style Selected: {selectedStyle.name}</Typography>
           </Card>
         )}
 
         {/* Place Order Button */}
-        <Card sx={{ padding: 2, mt: 4 }}>
+        <Card sx={{ padding: 2, mt: 4, borderRadius: '10px', boxShadow: 3 }}>
           <Button
             variant="contained"
             color="secondary"
             onClick={handleSubmit}
             fullWidth
-            sx={{ padding: '10px', fontSize: '14px' }}
+            sx={{
+              padding: '15px',
+              fontSize: '16px',
+              fontWeight: 'bold',
+              textTransform: 'none',
+              backgroundColor: '#ff3e6c',
+              '&:hover': { backgroundColor: '#ff6297' },
+              borderRadius: '25px',
+              boxShadow: '0 4px 10px rgba(0, 0, 0, 0.1)',
+            }}
           >
             Place Order
-          </Button>
-        </Card>
-
-        {/* Back Button */}
-        <Card sx={{ padding: 2, mt: 2 }}>
-          <Button
-            variant="outlined"
-            color="default"
-            onClick={() => navigate(-1)} // Navigate to the previous page
-            fullWidth
-            sx={{ padding: '10px', fontSize: '14px' }}
-          >
-            Back
           </Button>
         </Card>
       </Box>

@@ -6,7 +6,7 @@ const Customer = () => {
 
   const handleLogout = () => {
     // Add your logout logic here (e.g., clear tokens, redirect to login page)
-    navigate('/login'); // Redirect to login page after logout
+    navigate('/'); // Redirect to login page after logout
   };
 
   return (

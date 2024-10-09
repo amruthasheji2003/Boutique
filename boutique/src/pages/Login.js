@@ -29,15 +29,9 @@ const Login = () => {
 
     if (!valid) return;
 
-    // Check for admin credentials
-    if (email === 'admin@gmail.com' && password === 'Admin@2025') {
-      navigate('/adminpage'); // Correctly navigate to the admin page
-      return; // Prevent further execution
-    }
-
-    // Attempt login for regular users
     try {
-      const response = await fetch('http://localhost:8080/api/auth/login', {
+      // First, attempt to log in as an admin
+      const adminResponse = await fetch('http://localhost:8080/api/admin/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -45,17 +39,41 @@ const Login = () => {
         body: JSON.stringify({ email, password }),
       });
 
-      const data = await response.json();
+      const adminData = await adminResponse.json();
 
-      if (response.status === 200) {
-        console.log('Login successful', data);
-        localStorage.setItem('token', data.token);
-        setSuccessMessage('Login successful! Redirecting...');
+      if (adminResponse.status === 200 && adminData.admin) { // If admin login is successful
+        console.log('Admin login successful', adminData);
+        localStorage.setItem('token', adminData.token); // Store the JWT token for admin
+        setSuccessMessage('Admin login successful! Redirecting...');
+
         setTimeout(() => {
-          navigate('/Customer');
+          navigate('/admin'); // Navigate to admin dashboard
+        }, 2000);
+        return; // Exit function after admin login
+      }
+
+      // If admin login fails, try regular user login
+      const userResponse = await fetch('http://localhost:8080/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const userData = await userResponse.json();
+
+      if (userResponse.status === 200) { // If user login is successful
+        console.log('User login successful', userData);
+        localStorage.setItem('token', userData.token); // Store the JWT token for user
+        setSuccessMessage('User login successful! Redirecting...');
+
+        setTimeout(() => {
+          navigate('/Customer'); // Navigate to customer page
         }, 2000);
       } else {
-        setEmailError(data.message || 'Login failed');
+        // Show error message returned from the server
+        setEmailError(userData.message || 'Login failed');
       }
     } catch (error) {
       console.error('Login error:', error);

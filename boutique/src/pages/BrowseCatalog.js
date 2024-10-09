@@ -1,130 +1,156 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import churidar1 from '../assets/churidar1.jpg';
-import churidar2 from '../assets/churidar2.jpg';
-import lehenga1 from '../assets/lehenga1.jpg';
-import lehenga2 from '../assets/lehenga2.jpg';
-import lehenga3 from '../assets/lehenga3.jpg';
-import pattpavada from '../assets/pattpavada.webp';
-import pattpavada2 from '../assets/pattpavada2.jpg';
-import frock1 from '../assets/frock1.jpg';
-import frock2 from '../assets/frock2.jpg';
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom'; // If using react-router
 
 const BrowseCatalog = () => {
-  const [catalogItems, setCatalogItems] = useState([]);
+  const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const navigate = useNavigate();
+  const [error, setError] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedProduct, setSelectedProduct] = useState(null); // State for selected product
+
+  const navigate = useNavigate(); // Hook for navigation
+
+  // Fetch products from backend
+  const fetchProducts = async () => {
+    setLoading(true);
+    try {
+      const response = await axios.get('http://localhost:8080/api/products');
+      setProducts(response.data);
+    } catch (error) {
+      setError('Error fetching products');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchCatalog = async () => {
-      try {
-        const data = [
-          { id: 1, name: 'Anarkali', price: 'Rs.850', imageUrl: churidar1 },
-          { id: 2, name: 'Lehenga', price: 'Rs.1200', imageUrl: lehenga1 },
-          { id: 3, name: 'Lehenga', price: 'Rs.3000', imageUrl: lehenga2 },
-          { id: 4, name: 'Anarkali', price: 'Rs.1000', imageUrl: churidar2 },
-          { id: 5, name: 'Lehenga', price: 'Rs.2800', imageUrl: lehenga3 },
-          { id: 6, name: 'Pattpavada', price: 'Rs.1000', imageUrl: pattpavada },
-          { id: 7, name: 'Pattpavada', price: 'Rs.2000', imageUrl: pattpavada2 },
-          { id: 8, name: 'Frock', price: 'Rs.850', imageUrl: frock1 },
-          { id: 9, name: 'Frock', price: 'Rs.900', imageUrl: frock2 }
-        ];
-
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        setCatalogItems(data);
-      } catch (error) {
-        setError('Failed to load catalog items.');
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchCatalog();
+    fetchProducts();
   }, []);
 
-  const addToCart = (item) => {
-    const currentCart = JSON.parse(localStorage.getItem('cart')) || [];
-    if (!currentCart.find(cartItem => cartItem.id === item.id)) {
-      currentCart.push(item);
-      localStorage.setItem('cart', JSON.stringify(currentCart));
-      alert(`${item.name} has been added to the cart!`);
-    } else {
-      alert(`${item.name} is already in your cart!`);
-    }
+  const filteredProducts = products.filter((product) =>
+    product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    product.category.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  // Function to handle product click
+  const handleProductClick = (product) => {
+    setSelectedProduct(product);
   };
 
-  const addToWishlist = (item) => {
-    const currentWishlist = JSON.parse(localStorage.getItem('wishlist')) || [];
-    if (!currentWishlist.find(wishlistItem => wishlistItem.id === item.id)) {
-      currentWishlist.push(item);
-      localStorage.setItem('wishlist', JSON.stringify(currentWishlist));
-      alert(`${item.name} has been added to your wishlist!`);
-    } else {
-      alert(`${item.name} is already in your wishlist!`);
-    }
+  // Back button handler
+  const handleBackClick = () => {
+    navigate(-1); // Use React Router's navigate to go back
+    // Or use: window.history.back(); if not using React Router
   };
-
-  if (loading) return <div className="text-center">Loading...</div>;
-  if (error) return <div className="text-red-500 text-center">{error}</div>;
 
   return (
-    <div className="catalog-container p-6">
-      {/* Back Button */}
-      <button
-        className="absolute top-4 right-4 bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600"
-        onClick={() => navigate('/customer')}
-      >
-        Back
-      </button>
+    <div className="container mx-auto p-6">
+      {/* Back Button as Header */}
+      <div className="flex justify-start mb-6">
+        <button
+          onClick={handleBackClick}
+          className="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600"
+        >
+          Back
+        </button>
+      </div>
 
       <h1 className="text-4xl font-bold text-center mb-6">Browse Catalog</h1>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {catalogItems.map((item) => (
-          <div key={item.id} className="catalog-item bg-white shadow-lg p-4 rounded-lg">
-            <div className="relative overflow-hidden rounded-lg mb-4">
-              <img 
-                src={item.imageUrl} 
-                alt={item.name} 
-                className="w-full h-auto object-contain max-h-48" 
+
+      {/* Search Products */}
+      <input
+        type="text"
+        value={searchQuery}
+        onChange={(e) => setSearchQuery(e.target.value)}
+        placeholder="Search products by name or category..."
+        className="block w-full p-2 border border-gray-300 rounded-lg mb-6"
+      />
+
+      {/* Loading or Error Handling */}
+      {loading ? (
+        <div className="text-center">Loading products...</div>
+      ) : error ? (
+        <div className="text-red-500 text-center">{error}</div>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+          {filteredProducts.length === 0 ? (
+            <p className="text-center col-span-full">No products available</p>
+          ) : (
+            filteredProducts.map((product) => (
+              <div
+                key={product._id}
+                className="catalog-item bg-white shadow-lg p-4 rounded-lg"
+                onClick={() => handleProductClick(product)} // Click to view details
+              >
+                <div className="relative overflow-hidden rounded-lg mb-4">
+                  <img
+                    src={`http://localhost:8080/${product.image}`}
+                    alt={product.name}
+                    className="max-w-[200px] h-auto object-contain mb-2 rounded"
+                  />
+                </div>
+                <h2 className="text-2xl font-semibold mb-2">{product.name}</h2>
+                <p className="text-lg text-gray-600 mb-2">Price: ${product.price}</p>
+                <p className="text-lg text-gray-600 mb-2">Category: {product.category}</p>
+                <p className="text-lg text-gray-600 mb-2">Stock: {product.stock}</p>
+                <p className="text-lg text-gray-600 mb-4">{product.description}</p>
+
+                {/* Button Container */}
+                <div className="flex justify-between">
+                  <button
+                    className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600"
+                  >
+                    Add to Cart
+                  </button>
+                  <button
+                    className="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600"
+                  >
+                    Add to Wishlist
+                  </button>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+      )}
+
+      {/* Product Details Section */}
+      {selectedProduct && (
+        <div className="mt-8 p-6 border border-gray-300 rounded-lg bg-white">
+          <h2 className="text-3xl font-bold mb-4">Product Details</h2>
+          <div className="flex">
+            <div className="w-1/2 pr-4">
+              <img
+                src={`http://localhost:8080/${selectedProduct.image}`}
+                alt={selectedProduct.name}
+                className="w-full h-auto object-contain max-h-96"
               />
             </div>
-            <h2 className="text-2xl font-semibold mb-2">{item.name}</h2>
-            <p className="text-lg text-gray-600 mb-4">{item.price}</p>
-            <button 
-              className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 mr-2"
-              onClick={() => addToCart(item)}
-            >
-              Add to Cart
-            </button>
-            <button 
-              className="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600"
-              onClick={() => addToWishlist(item)}
-            >
-              Add to Wishlist
-            </button>
+            <div className="w-1/2">
+              <h3 className="text-2xl font-semibold">{selectedProduct.name}</h3>
+              <p className="text-lg text-gray-600">Price: ${selectedProduct.price}</p>
+              <p className="text-lg text-gray-600">Category: {selectedProduct.category}</p>
+              <p className="text-lg text-gray-600">Stock: {selectedProduct.stock}</p>
+              <p className="text-lg text-gray-600">{selectedProduct.description}</p>
+
+              {/* Buttons in the product details section */}
+              <div className="mt-6 space-x-4">
+                <button
+                  className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600"
+                >
+                  Add to Cart
+                </button>
+                <button
+                  className="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600"
+                >
+                  Add to Wishlist
+                </button>
+              </div>
+            </div>
           </div>
-        ))}
-      </div>
-      <div className="mt-8 text-center">
-        <button 
-          className="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 mr-4"
-          onClick={() => navigate('/cart')}
-        >
-          View Cart
-        </button>
-        <button 
-          className="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 mr-4"
-          onClick={() => navigate('/wishlist')}
-        >
-          View Wishlist
-        </button>
-        <button 
-          className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600"
-          onClick={() => navigate('/customer')}
-        >
-          Back 
-        </button>
-      </div>
+        </div>
+      )}
     </div>
   );
 };

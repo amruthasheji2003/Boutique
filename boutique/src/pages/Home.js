@@ -1,24 +1,27 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { FaSearch } from 'react-icons/fa';
 
 const Home = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Check if token exists in localStorage when component mounts
     const token = localStorage.getItem('token');
-    if (token) {
-      setIsAuthenticated(true);  // If token exists, user is authenticated
-    } else {
-      setIsAuthenticated(false);  // If no token, ensure isAuthenticated is false
-    }
-  }, []);  // Empty dependency array to run only on component mount
+    setIsAuthenticated(!!token);
+  }, []);
 
   const handleLogout = () => {
-    localStorage.removeItem('token');  // Clear token from localStorage
-    setIsAuthenticated(false);         // Update state to reflect logout
-    navigate('/login');                // Redirect to login page
+    localStorage.removeItem('token');
+    setIsAuthenticated(false);
+    navigate('/');
+  };
+
+  const handleSearch = () => {
+    if (searchQuery.trim()) {
+      navigate(`/browse-catalog?search=${encodeURIComponent(searchQuery)}`);
+    }
   };
 
   const featuredProducts = [
@@ -45,34 +48,38 @@ const Home = () => {
   return (
     <div>
       {/* Header Section */}
-      <header className='h-16 shadow-md bg-yellow-900 fixed w-full z-40'>
-        <div className='h-full container mx-auto flex items-center px-4 justify-between'>
-          <div className='flex items-center gap-4'>
-            <Link to="/" className='text-green text-2xl font-bold hover:text-pink-100 transition-colors duration-300'>
-              Tailor's Touch Boutique
-            </Link>
-            <nav className='hidden lg:flex items-center space-x-40 ml-20'>
-              <Link to="/" className='text-white text-lg hover:text-blue-300 transition-colors duration-300'>Home</Link>
-              <Link to="/featured-products" className='text-white text-lg hover:text-blue-300 transition-colors duration-300'>Featured Products</Link>
-              <Link to="/contact-us" className='text-white text-lg hover:text-blue-300 transition-colors duration-300'>Contact Us</Link>
-            </nav>
+      <header className='h-20 shadow-md bg-white fixed w-full z-40'>
+        <div className='container mx-auto flex items-center justify-between px-4 h-full'>
+          {/* Logo Section */}
+          <Link to="/" className='text-green text-3xl font-bold hover:text-pink-100 transition-colors duration-300'>
+            Tailor's Touch Boutique
+          </Link>
+          
+          {/* Search Bar */}
+          <div className='flex items-center w-full max-w-md mx-4'>
+            <input
+              type='text'
+              placeholder='Search for products...'
+              className='w-full px-4 py-2 border rounded-l-md focus:outline-none focus:ring-2 focus:ring-blue-500'
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)} // Update search query state
+            />
+            <button 
+              className='bg-blue-500 text-white px-4 py-2 rounded-r-md hover:bg-blue-600 transition-colors duration-300'
+              onClick={handleSearch} // Handle search button click
+            >
+              <FaSearch />
+            </button>
           </div>
 
-          <div className='flex items-center gap-10'>
-            {/* Conditional Login/Logout */}
-            {isAuthenticated ? (
-              <button
-                onClick={handleLogout}
-                className='px-4 py-2 rounded-full text-teal-800 bg-white hover:bg-gray-100 transition-colors duration-300'
-              >
-                Logout
-              </button>
-            ) : (
-              <Link to="/login" className='px-4 py-2 rounded-full text-teal-800 bg-white hover:bg-gray-100 transition-colors duration-300'>
-                Login
-              </Link>
-            )}
-          </div>
+          {/* Navigation Links */}
+          <nav className='flex items-center space-x-8'>
+            <Link to="/" className='text-gray-700 hover:text-blue-500 transition-colors duration-300'>Home</Link>
+            <Link to="/contact-us" className='text-gray-700 hover:text-blue-500 transition-colors duration-300'>Contact Us</Link>
+            <Link to="/login" className='bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600 transition-colors duration-300'>
+              Login
+            </Link>
+          </nav>
         </div>
       </header>
 
@@ -111,13 +118,16 @@ const Home = () => {
 
       {/* About Us Section */}
       <div className="about-us py-16 px-6 bg-gray-100">
-        <h2 className="text-3xl font-bold text-center mb-8">About Us</h2>
+        <h2 className="text-4xl font-bold text-center mb-6 text-green-600">About Us</h2>
         <div className="max-w-4xl mx-auto text-center">
           <p className="text-lg mb-4">
-            At Tailor's Touch Boutique, we believe that every garment should tell a unique story. Our personalized tailoring services are designed to meet your specific needs and preferences, ensuring that you look and feel your best. With a commitment to quality craftsmanship and attention to detail, we offer a wide range of custom tailoring options that blend timeless elegance with modern trends.
+            At Tailor's Touch Boutique, we specialize in custom tailoring, blending timeless craftsmanship with modern style.
+          </p>
+          <p className="text-lg mb-4">
+            Our commitment to quality ensures that every piece is crafted to perfection, making you look and feel extraordinary.
           </p>
           <p className="text-lg">
-            Whether you are preparing for a special event or simply want to refresh your wardrobe with custom pieces, our skilled tailors are here to provide you with exceptional service and exquisite results. Join us in experiencing the art of personalized fashion at its finest.
+            Discover the elegance of personalized fashion tailored just for you, where every stitch tells your story.
           </p>
         </div>
       </div>

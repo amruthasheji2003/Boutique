@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 
 export default function Registration() {
   const [email, setEmail] = useState('');
@@ -16,7 +16,6 @@ export default function Registration() {
     const value = e.target.value;
     setEmail(value);
 
-    // Check if the first letter is capitalized
     if (value.length > 0 && /^[A-Z]/.test(value)) {
       setEmailWarning('Please start your email with a lowercase letter.');
     } else {
@@ -28,7 +27,6 @@ export default function Registration() {
     const value = e.target.value;
     setPhoneNumber(value);
 
-    // Check if the first digit is between 6 and 9
     if (value.length > 0 && !/^[6-9]/.test(value)) {
       setPhoneWarning('Phone number must start with a digit between 6 and 9.');
     } else if (value.length < 10) {
@@ -46,9 +44,8 @@ export default function Registration() {
   const handleSubmit = async (event) => {
     event.preventDefault();
     setError('');
-    setPasswordWarning(''); // Reset password warning
+    setPasswordWarning(''); 
 
-    // Validation checks
     if (emailWarning) {
       setError('Fix the email warning before submitting.');
       return;
@@ -92,7 +89,6 @@ export default function Registration() {
         setConfirmPassword('');
         setPhoneNumber('');
 
-        // Redirect to login page after successful registration
         navigate('/login');
       } else {
         setError(data.message || 'Registration failed');
@@ -102,59 +98,85 @@ export default function Registration() {
     }
   };
 
+  const handleBackButtonClick = () => {
+    navigate('/login');
+  };
+
   return (
-    <div style={styles.container}>
-      <div style={styles.formContainer}>
-        <h2 style={styles.title}>Sign Up</h2>
-        <form onSubmit={handleSubmit}>
-          <label style={styles.label}>
-            Email/Username
-            <input
-              type="text"
-              value={email}
-              onChange={handleEmailChange}
-              style={styles.input}
-              required
-            />
-            {emailWarning && <p style={styles.warning}>{emailWarning}</p>} {/* Display email warning */}
-          </label>
-          <label style={styles.label}>
-            Phone Number
-            <input
-              type="tel"
-              value={phoneNumber}
-              onChange={handlePhoneChange} // Update to use handlePhoneChange
-              style={styles.input}
-              required
-            />
-            {phoneWarning && <p style={styles.warning}>{phoneWarning}</p>} {/* Display phone warning */}
-          </label>
-          <label style={styles.label}>
-            Password
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              style={styles.input}
-              required
-            />
-            {passwordWarning && <p style={styles.warning}>{passwordWarning}</p>} {/* Display password warning */}
-          </label>
-          <label style={styles.label}>
-            Confirm Password
-            <input
-              type="password"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              style={styles.input}
-              required
-            />
-          </label>
-          {error && <p style={styles.error}>{error}</p>}
-          <button type="submit" style={styles.button}>Sign Up</button>
-        </form>
+    <>
+      {/* Header Section */}
+      <header className='h-16 shadow-md bg-yellow-900 fixed w-full z-40'>
+        <div className='h-full container mx-auto flex items-center px-4 justify-between'>
+          <div className='flex items-center gap-4'>
+            <Link to="/" className='text-green text-2xl font-bold hover:text-pink-100 transition-colors duration-300'>
+              Tailor's Touch Boutique
+            </Link>
+            <nav className='hidden lg:flex items-center space-x-40 ml-20'>
+              <Link to="/" className='text-white text-lg hover:text-blue-300 transition-colors duration-300'>Home</Link>
+              <Link to="/featured-products" className='text-white text-lg hover:text-blue-300 transition-colors duration-300'>Featured Products</Link>
+              <Link to="/contact-us" className='text-white text-lg hover:text-blue-300 transition-colors duration-300'>Contact Us</Link>
+            </nav>
+          </div>
+          <button onClick={handleBackButtonClick} className='text-white ml-4'>
+            Back
+          </button>
+        </div>
+      </header>
+
+      {/* Registration Form */}
+      <div style={styles.container}>
+        <div style={styles.formContainer}>
+          <h2 style={styles.title}>Sign Up</h2>
+          <form onSubmit={handleSubmit}>
+            <label style={styles.label}>
+              Email/Username
+              <input
+                type="text"
+                value={email}
+                onChange={handleEmailChange}
+                style={styles.input}
+                required
+              />
+              {emailWarning && <p style={styles.warning}>{emailWarning}</p>} 
+            </label>
+            <label style={styles.label}>
+              Phone Number
+              <input
+                type="tel"
+                value={phoneNumber}
+                onChange={handlePhoneChange} 
+                style={styles.input}
+                required
+              />
+              {phoneWarning && <p style={styles.warning}>{phoneWarning}</p>} 
+            </label>
+            <label style={styles.label}>
+              Password
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                style={styles.input}
+                required
+              />
+              {passwordWarning && <p style={styles.warning}>{passwordWarning}</p>} 
+            </label>
+            <label style={styles.label}>
+              Confirm Password
+              <input
+                type="password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                style={styles.input}
+                required
+              />
+            </label>
+            {error && <p style={styles.error}>{error}</p>}
+            <button type="submit" style={styles.button}>Sign Up</button>
+          </form>
+        </div>
       </div>
-    </div>
+    </>
   );
 }
 
@@ -166,12 +188,15 @@ const styles = {
     height: '100vh',
     backgroundImage: `url(${require('../assets/newtt.jpg')})`,
     backgroundSize: 'cover',
+    paddingTop: '100px', // Ensure content is below the fixed header
   },
   formContainer: {
     backgroundColor: 'rgba(255, 255, 255, 0.8)',
     padding: '40px',
     borderRadius: '10px',
     textAlign: 'center',
+    maxWidth: '400px',
+    width: '100%',
   },
   title: {
     fontSize: '24px',
@@ -206,7 +231,7 @@ const styles = {
     marginBottom: '10px',
   },
   warning: {
-    color: 'orange', // Color for the warning message
+    color: 'orange',
     marginTop: '5px',
     fontSize: '14px',
   },
