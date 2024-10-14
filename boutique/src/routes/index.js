@@ -15,7 +15,7 @@ import Wishlist from '../pages/Wishlist';
 import Cart from '../pages/Cart';
 import DressStyleSelection from '../pages/DressStyleSelection';
 import ForgotPassword from '../pages/ForgotPassword';
-import CreateProfile from '../pages/CreateProfile';
+import Profile from '../pages/Profile';
 import AdminPage from '../pages/AdminPage';
 import ManageUsers from '../pages/ManageUsers';
 import ManageProducts from '../pages/ManageProducts';
@@ -29,7 +29,7 @@ const router = createBrowserRouter([
             { path: "login", element: <Login /> },
             { path: "customer", element: <Customer /> },
             { path: "registration", element: <Registration /> },
-            { path: "createprofile", element: <CreateProfile /> },
+            { path: "profile", element: <Profile /> },
             { path: "featured-products", element: <FeaturedProducts /> },
             { path: "contact-us", element: <ContactUs /> },
             { path: "place-order", element: <PlaceOrder /> },
@@ -46,10 +46,6 @@ const router = createBrowserRouter([
             {
                 path: "admin",
                 element: <AdminPage />,
-                // children: [
-                //     { path: "manage-users", element: <ManageUsers/> },
-                //     { path: "manage-products", element: <ManageProducts/> },
-                // ],
             },
             { path: "manage-users", element: <ManageUsers/> },
             { path: "manage-products", element: <ManageProducts/> },

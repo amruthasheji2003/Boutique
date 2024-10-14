@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom'; // If using react-router
+import { FaShoppingCart, FaHeart } from 'react-icons/fa'; // Icons for Cart and Wishlist
 
 const BrowseCatalog = () => {
   const [products, setProducts] = useState([]);
@@ -8,6 +9,7 @@ const BrowseCatalog = () => {
   const [error, setError] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedProduct, setSelectedProduct] = useState(null); // State for selected product
+  const [wishlist, setWishlist] = useState([]); // State for wishlist
 
   const navigate = useNavigate(); // Hook for navigation
 
@@ -38,10 +40,18 @@ const BrowseCatalog = () => {
     setSelectedProduct(product);
   };
 
+  // Toggle wishlist function
+  const toggleWishlist = (productId) => {
+    setWishlist((prevWishlist) =>
+      prevWishlist.includes(productId)
+        ? prevWishlist.filter((id) => id !== productId) // Remove from wishlist
+        : [...prevWishlist, productId] // Add to wishlist
+    );
+  };
+
   // Back button handler
   const handleBackClick = () => {
     navigate(-1); // Use React Router's navigate to go back
-    // Or use: window.history.back(); if not using React Router
   };
 
   return (
@@ -80,35 +90,45 @@ const BrowseCatalog = () => {
             filteredProducts.map((product) => (
               <div
                 key={product._id}
-                className="catalog-item bg-white shadow-lg p-4 rounded-lg"
+                className="catalog-item bg-white shadow-lg p-4 rounded-lg relative flex flex-col items-center"
                 onClick={() => handleProductClick(product)} // Click to view details
               >
+                {/* Icons for Cart and Wishlist */}
+                <div className="absolute top-2 right-2 flex space-x-2">
+                  {/* Wishlist Icon */}
+                  <FaHeart
+                    className={`cursor-pointer text-2xl ${
+                      wishlist.includes(product._id) ? 'text-red-600' : 'text-gray-500'
+                    } hover:text-red-600`}
+                    title="Add to Wishlist"
+                    onClick={(e) => {
+                      e.stopPropagation(); // Prevents triggering the product click event
+                      toggleWishlist(product._id);
+                    }}
+                  />
+                  {/* Cart Icon */}
+                  <FaShoppingCart
+                    className="text-blue-500 hover:text-blue-600 cursor-pointer text-2xl"
+                    title="Add to Cart"
+                  />
+                </div>
+                
+                {/* Product Image */}
                 <div className="relative overflow-hidden rounded-lg mb-4">
                   <img
                     src={`http://localhost:8080/${product.image}`}
                     alt={product.name}
-                    className="max-w-[200px] h-auto object-contain mb-2 rounded"
+                    className="w-full h-40 object-cover mb-2"
                   />
                 </div>
-                <h2 className="text-2xl font-semibold mb-2">{product.name}</h2>
-                <p className="text-lg text-gray-600 mb-2">Price: ${product.price}</p>
-                <p className="text-lg text-gray-600 mb-2">Category: {product.category}</p>
-                <p className="text-lg text-gray-600 mb-2">Stock: {product.stock}</p>
-                <p className="text-lg text-gray-600 mb-4">{product.description}</p>
+                
+                {/* Product Details */}
+                <h2 className="text-xl font-semibold mb-2 text-center">{product.name}</h2>
+                <p className="text-lg text-gray-600 mb-2">Rs.{product.price}</p>
+                <p className="text-sm text-gray-600 mb-2">Category:{product.category}</p>
+                <p className="text-sm text-gray-600 mb-2">Stock: {product.stock}</p>
+                <p className="text-sm text-gray-600 mb-2">{product.description}</p>
 
-                {/* Button Container */}
-                <div className="flex justify-between">
-                  <button
-                    className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600"
-                  >
-                    Add to Cart
-                  </button>
-                  <button
-                    className="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600"
-                  >
-                    Add to Wishlist
-                  </button>
-                </div>
               </div>
             ))
           )}
@@ -129,8 +149,8 @@ const BrowseCatalog = () => {
             </div>
             <div className="w-1/2">
               <h3 className="text-2xl font-semibold">{selectedProduct.name}</h3>
-              <p className="text-lg text-gray-600">Price: ${selectedProduct.price}</p>
-              <p className="text-lg text-gray-600">Category: {selectedProduct.category}</p>
+              <p className="text-lg text-gray-600">Rs.{selectedProduct.price}</p>
+              <p className="text-lg text-gray-600"> {selectedProduct.category}</p>
               <p className="text-lg text-gray-600">Stock: {selectedProduct.stock}</p>
               <p className="text-lg text-gray-600">{selectedProduct.description}</p>
 

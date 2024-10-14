@@ -62,70 +62,72 @@ const ManageUsers = () => {
     };
 
     return (
-        <div className="container mx-auto p-4">
+        <div className="container mx-auto p-6 bg-white shadow-lg rounded-lg mt-8">
             {/* Back button at the top */}
             <button 
                 onClick={() => navigate(-1)} // Navigate back to the previous page
-                className="bg-gray-300 text-black px-4 py-2 mb-4"
+                className="text-sm text-gray-700 bg-gray-100 hover:bg-gray-200 transition-all px-4 py-2 rounded mb-6"
             >
                 Back
             </button>
 
-            <h1 className="text-2xl font-bold mb-4">Manage Users</h1>
+            <h1 className="text-3xl font-semibold mb-6 text-gray-800">Manage Users</h1>
 
             {/* Input field for searching users by email or phone number */}
-            <div className="flex space-x-2 mb-4">
+            <div className="flex space-x-4 mb-6">
                 <input
                     type="text"
                     placeholder="Search users by email or phone number"
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)} // Only set the search term
-                    className="border p-2 w-full"
+                    className="border-2 border-gray-300 focus:ring-blue-500 focus:border-blue-500 p-3 rounded-lg flex-grow"
                 />
                 <button 
                     onClick={handleSearch} // Search when the button is clicked
-                    className="bg-blue-500 text-white px-4 py-2"
+                    className="bg-blue-500 hover:bg-blue-600 transition-all text-white px-5 py-3 rounded-lg shadow-md font-medium"
                 >
                     Search
                 </button>
             </div>
 
             {/* Table to display the users */}
-            <table className="min-w-full border">
-                <thead>
-                    <tr className="bg-gray-200">
-                        <th className="border px-4 py-2">Email</th>
-                        <th className="border px-4 py-2">Phone Number</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {currentUsers.length > 0 ? (
-                        currentUsers.map(user => (
-                            <tr key={user._id} className="border-b">
-                                <td className="border px-4 py-2">{user.email}</td>
-                                <td className="border px-4 py-2">{user.phoneNumber}</td>
-                            </tr>
-                        ))
-                    ) : (
+            <div className="overflow-x-auto">
+                <table className="min-w-full table-auto">
+                    <thead className="bg-blue-50">
                         <tr>
-                            <td colSpan="2" className="text-center py-2">No users found</td>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Phone Number</th>
                         </tr>
-                    )}
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody className="bg-white divide-y divide-gray-200">
+                        {currentUsers.length > 0 ? (
+                            currentUsers.map(user => (
+                                <tr key={user._id} className="hover:bg-gray-50 transition-all">
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{user.email}</td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{user.phoneNumber}</td>
+                                </tr>
+                            ))
+                        ) : (
+                            <tr>
+                                <td colSpan="2" className="text-center py-4 text-gray-500">No users found</td>
+                            </tr>
+                        )}
+                    </tbody>
+                </table>
+            </div>
 
             {/* Pagination controls */}
-            <div className="flex justify-between mt-4">
+            <div className="flex justify-between mt-6">
                 <button 
                     onClick={prevPage}
-                    className={`px-4 py-2 bg-gray-300 ${currentPage === 1 ? 'opacity-50 cursor-not-allowed' : ''}`}
+                    className={`px-6 py-2 rounded-lg text-gray-700 bg-gray-100 hover:bg-gray-200 transition-all ${currentPage === 1 ? 'opacity-50 cursor-not-allowed' : ''}`}
                     disabled={currentPage === 1}
                 >
                     Previous
                 </button>
                 <button 
                     onClick={nextPage}
-                    className={`px-4 py-2 bg-blue-500 text-white ${indexOfLastUser >= filteredUsers.length ? 'opacity-50 cursor-not-allowed' : ''}`}
+                    className={`px-6 py-2 rounded-lg bg-blue-500 text-white hover:bg-blue-600 transition-all ${indexOfLastUser >= filteredUsers.length ? 'opacity-50 cursor-not-allowed' : ''}`}
                     disabled={indexOfLastUser >= filteredUsers.length}
                 >
                     Next

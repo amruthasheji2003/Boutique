@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';  // Import useNavigate
 
 const ManageProducts = () => {
   const [products, setProducts] = useState([]);
@@ -10,6 +11,8 @@ const ManageProducts = () => {
   const [error, setError] = useState('');
   const [selectedImage, setSelectedImage] = useState(null);
   const [previewImage, setPreviewImage] = useState(null);
+
+  const navigate = useNavigate();  // Initialize navigate function
 
   // Fetch products from the backend
   const fetchProducts = async () => {
@@ -121,15 +124,23 @@ const ManageProducts = () => {
 
   return (
     <div className="container mx-auto p-4">
-      <h1 className="text-center text-2xl font-bold mb-4">Manage Products</h1>
+      <h1 className="text-center text-3xl font-bold mb-6">Manage Products</h1>
+
+      {/* Back Button */}
+      <button
+        onClick={() => navigate(-1)}  // Navigate back to the previous page
+        className="bg-gray-500 text-white px-4 py-2 rounded mb-6 hover:bg-gray-600"
+      >
+        Back
+      </button>
 
       {/* Error display */}
       {error && <p className="text-red-500 mb-4">{error}</p>}
 
       {/* Add or Edit Product Form */}
-      <div className="bg-gray-100 p-4 mb-4 rounded shadow">
-        <h2 className="text-xl">{editProduct ? 'Edit Product' : 'Add New Product'}</h2>
-        <form onSubmit={editProduct ? handleEditProduct : handleAddProduct} encType="multipart/form-data">
+      <div className="bg-gray-100 p-6 mb-6 rounded shadow-lg">
+        <h2 className="text-2xl mb-4">{editProduct ? 'Edit Product' : 'Add New Product'}</h2>
+        <form onSubmit={editProduct ? handleEditProduct : handleAddProduct} encType="multipart/form-data" className="space-y-4">
           <input
             type="text"
             name="name"
@@ -137,7 +148,7 @@ const ManageProducts = () => {
             onChange={handleInputChange}
             placeholder="Product Name"
             required
-            className="block w-full mb-2 p-2 border border-gray-300 rounded"
+            className="block w-full p-3 border border-gray-300 rounded"
           />
           <input
             type="number"
@@ -146,7 +157,7 @@ const ManageProducts = () => {
             onChange={handleInputChange}
             placeholder="Price"
             required
-            className="block w-full mb-2 p-2 border border-gray-300 rounded"
+            className="block w-full p-3 border border-gray-300 rounded"
           />
           <input
             type="text"
@@ -155,7 +166,7 @@ const ManageProducts = () => {
             onChange={handleInputChange}
             placeholder="Category"
             required
-            className="block w-full mb-2 p-2 border border-gray-300 rounded"
+            className="block w-full p-3 border border-gray-300 rounded"
           />
           <input
             type="number"
@@ -164,7 +175,7 @@ const ManageProducts = () => {
             onChange={handleInputChange}
             placeholder="Stock"
             required
-            className="block w-full mb-2 p-2 border border-gray-300 rounded"
+            className="block w-full p-3 border border-gray-300 rounded"
           />
           <textarea
             name="description"
@@ -172,23 +183,26 @@ const ManageProducts = () => {
             onChange={handleInputChange}
             placeholder="Description"
             required
-            className="block w-full mb-2 p-2 border border-gray-300 rounded resize-none h-20"
+            className="block w-full p-3 border border-gray-300 rounded resize-none h-24"
           />
-          {/* Image Upload */}
           <input
             type="file"
             accept="image/*"
             onChange={handleImageChange}
-            className="block w-full mb-2 p-2 border border-gray-300 rounded"
+            className="block w-full p-3 border border-gray-300 rounded"
           />
           {previewImage && (
-            <img src={previewImage} alt="Preview" className="w-1/2 h-auto object-contain mb-2" />
+            <img src={previewImage} alt="Preview" className="w-48 h-48 object-contain mb-4 rounded-md shadow" />
           )}
-          <button type="submit" className="bg-green-500 text-white p-2 rounded w-full">
+          <button type="submit" className="bg-green-500 text-white p-3 rounded w-full hover:bg-green-600">
             {editProduct ? 'Update Product' : 'Add Product'}
           </button>
           {editProduct && (
-            <button type="button" onClick={() => { setEditProduct(null); setPreviewImage(null); }} className="bg-red-500 text-white p-2 rounded w-full mt-2">
+            <button
+              type="button"
+              onClick={() => { setEditProduct(null); setPreviewImage(null); }}
+              className="bg-red-500 text-white p-3 rounded w-full mt-4 hover:bg-red-600"
+            >
               Cancel Edit
             </button>
           )}
@@ -201,37 +215,43 @@ const ManageProducts = () => {
         value={searchQuery}
         onChange={(e) => setSearchQuery(e.target.value)}
         placeholder="Search products by name or category..."
-        className="block w-full p-2 border border-gray-300 rounded mb-4"
+        className="block w-full p-3 border border-gray-300 rounded mb-6"
       />
 
-      {/* Display Products */}
+      {/* Display Products in Grid */}
       {loading ? (
         <p>Loading products...</p>
       ) : filteredProducts.length === 0 ? (
         <p>No products available</p>
       ) : (
-        <div className="mt-4">
-          {filteredProducts.map((product) => (
-            <div key={product._id} className="bg-gray-200 p-4 mb-2 rounded shadow">
-              <h3 className="text-lg font-semibold">{product.name}</h3>
-              <p>Price: ${product.price}</p>
-              <p>Category: {product.category}</p>
-              <p>Stock: {product.stock}</p>
-              <p>{product.description}</p>
-              {product.image && (
-                <img 
-                  src={`http://localhost:8080/${product.image}`} 
-                  alt={product.name} 
-                  className="max-w-[200px] h-auto object-contain mb-2 rounded" 
-                />
-              )}
-              <button onClick={() => setEditProduct(product)} className="bg-blue-500 text-white p-1 rounded mr-2">
-                Edit
-              </button>
-              <button onClick={() => handleDeleteProduct(product._id)} className="bg-red-500 text-white p-1 rounded">
-                Delete
-              </button>
-            </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+{filteredProducts.map((product) => (
+  <div key={product._id} className="bg-white p-4 rounded-lg shadow-lg">
+    <img
+      src={`http://localhost:8080/${product.image}`}
+      alt={product.name}
+      className="w-full h-48 object-contain mb-4 rounded"
+    />
+    <h3 className="text-lg font-semibold mb-2">{product.name}</h3>
+    <p className="text-sm text-gray-600">Rs.{product.price}</p>
+    <p className="text-sm text-gray-600">Category: {product.category}</p>
+    <p className="text-sm text-gray-600">Stock: {product.stock}</p>
+    <p className="text-sm text-gray-600">{product.description}</p> {/* Add this line for description */}
+    <button
+      onClick={() => setEditProduct(product)}
+      className="bg-blue-500 text-white px-3 py-1 rounded mt-4 hover:bg-blue-600"
+    >
+      Edit
+    </button>
+    <button
+      onClick={() => handleDeleteProduct(product._id)}
+      className="bg-red-500 text-white px-3 py-1 rounded mt-4 ml-2 hover:bg-red-600"
+    >
+      Delete
+    </button>
+  </div>
+
+
           ))}
         </div>
       )}
