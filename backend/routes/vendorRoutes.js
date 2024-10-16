@@ -1,26 +1,12 @@
+// routes/vendorRoutes.js
 const express = require('express');
+const { addVendor, getVendors } = require('../controllers/vendorController');
+const authMiddleware = require('../middleware/authMiddleware');
+const adminMiddleware = require('../middleware/adminMiddleware'); // Ensure this checks for admin permissions
 const router = express.Router();
-const Vendor = require('../models/Vendor');
 
-// POST request to add a vendor
-router.post('/add-vendor', async (req, res) => {
-  try {
-    const { name, email, phone } = req.body;
-
-    // Create a new vendor
-    const newVendor = new Vendor({
-      name,
-      email,
-      phone,
-    });
-
-    // Save vendor to the database
-    await newVendor.save();
-
-    res.status(201).json({ message: 'Vendor added successfully', vendor: newVendor });
-  } catch (error) {
-    res.status(500).json({ error: 'Failed to add vendor' });
-  }
-});
+// Protected routes for admin
+router.post('/', authMiddleware, adminMiddleware, addVendor); // Add a new vendor
+router.get('/', authMiddleware, adminMiddleware, getVendors); // Retrieve all vendors
 
 module.exports = router;

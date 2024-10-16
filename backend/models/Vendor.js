@@ -1,22 +1,20 @@
-const mongoose = require('mongoose');
+// // models/Vendor.js
+// const mongoose = require('mongoose');
 
-// Create Vendor schema
-const vendorSchema = new mongoose.Schema({
-  name: {
-    type: String,
-    required: true,
-  },
-  email: {
-    type: String,
-    required: true,
-  },
-  phone: {
-    type: String,
-    required: true,
-  }
-});
+// const vendorSchema = new mongoose.Schema({
+//     name: {
+//         type: String,
+//         required: true
+//     },
+//     email: {
+//         type: String,
+//         required: true,
+//         unique: true
+//     },
+//     phone: {
+//         type: String,
+//         required: true
+//     }
+// }, { timestamps: true });
 
-// Create Vendor model
-const Vendor = mongoose.model('Vendor', vendorSchema);
-
-module.exports = Vendor;
+// module.exports = mongoose.model('Vendor', vendorSchema);

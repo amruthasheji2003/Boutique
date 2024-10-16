@@ -5,7 +5,7 @@ const jwt = require('jsonwebtoken'); // For JWT generation
 const User = require('../models/User');
 
 // Secret key for JWT (should be stored in environment variables)
-const JWT_SECRET = 'your_jwt_secret_key';
+const JWT_SECRET = process.env.JWT_SECRET || 'your_jwt_secret_key'; // Use environment variable
 
 // Middleware to parse incoming JSON and URL-encoded data
 router.use(express.json());
@@ -94,15 +94,16 @@ router.get('/protected', verifyToken, (req, res) => {
     res.status(200).json({ message: 'You are authorized to access this route', user: req.user });
 });
 
-
-router.get('/users', async (req, res) => {
+// Get All Users (Protected Route)
+router.get('/users', verifyToken, async (req, res) => {
     try {
-      const users = await User.find();
-      res.json(users);
+        const users = await User.find();
+        res.json(users);
     } catch (err) {
-      res.status(500).json({ message: err.message });
+        res.status(500).json({ message: err.message });
     }
-  });
-  
+});
+
+// Additional routes can be added here...
 
 module.exports = router;

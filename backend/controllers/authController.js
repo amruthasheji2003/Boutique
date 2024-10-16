@@ -4,7 +4,12 @@ const jwt = require('jsonwebtoken');
 
 // Register a new user
 const registerUser = async (req, res) => {
-  const { email, password, phoneNumber } = req.body;
+  const { firstName, lastName, email, password, phoneNumber } = req.body;
+
+  // Input validation
+  if (!firstName || !lastName || !email || !password || !phoneNumber) {
+    return res.status(400).json({ message: 'All fields are required' });
+  }
 
   try {
     // Check if the user already exists
@@ -18,9 +23,11 @@ const registerUser = async (req, res) => {
 
     // Create a new user
     const newUser = new User({
+      firstName,
+      lastName,
       email,
       password: hashedPassword,
-      phoneNumber
+      phoneNumber,
     });
 
     // Save the user to the database
@@ -34,9 +41,13 @@ const registerUser = async (req, res) => {
 };
 
 // Login user
-
 const loginUser = async (req, res) => {
   const { email, password } = req.body;
+
+  // Input validation
+  if (!email || !password) {
+    return res.status(400).json({ message: 'Email and password are required' });
+  }
 
   try {
     // Check if the user exists
@@ -61,10 +72,20 @@ const loginUser = async (req, res) => {
       httpOnly: true,   // Protect against XSS
       secure: process.env.NODE_ENV === 'production', // Only send over HTTPS in production
       sameSite: 'Strict',
-      maxAge: 3600000   // 1 hour expiration
+      maxAge: 3600000,  // 1 hour expiration
     });
 
-    res.status(200).json({ message: 'Login successful' });
+    // Return user data (excluding password)
+    res.status(200).json({
+      message: 'Login successful',
+      user: {
+        id: user._id,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
+        phoneNumber: user.phoneNumber,
+      },
+    });
   } catch (error) {
     console.error('Error during login:', error);
     res.status(500).json({ message: 'Login failed', error: error.message });

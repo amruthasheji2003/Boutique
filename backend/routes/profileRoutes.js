@@ -1,11 +1,13 @@
 const express = require('express');
-const router = express.Router();
-const { createProfile } = require('../controllers/profileController');
-const authMiddleware = require('../middleware/authMiddleware');
+const { createOrUpdateProfile, getProfile } = require('../controllers/profileController');
+const authMiddleware = require('../middleware/authMiddleware'); // Middleware to check authentication
 
-// @route   POST /api/profile
-// @desc    Create a new profile
-// @access  Private (Requires Auth)
-router.post('/', authMiddleware, createProfile);
+const router = express.Router();
+
+// Get user profile
+router.get('/me', authMiddleware, getProfile);
+
+// Create or update profile
+router.post('/', authMiddleware, createOrUpdateProfile);
 
 module.exports = router;

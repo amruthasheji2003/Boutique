@@ -1,4 +1,4 @@
-const jwt = require('jsonwebtoken'); // Assuming you use JWT for token management
+const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 
 const adminMiddleware = async (req, res, next) => {
@@ -21,12 +21,13 @@ const adminMiddleware = async (req, res, next) => {
     }
 
     // Check if the user is an admin (assuming an 'isAdmin' field exists)
-    if (user.email === 'admin@gmail.com') {
+    if (user.isAdmin) { // Adjust to your model structure
       next(); // User is admin, proceed to the next middleware/route
     } else {
       return res.status(403).json({ message: 'Access denied, admin only' });
     }
   } catch (error) {
+    console.error('Admin middleware error:', error);
     return res.status(401).json({ message: 'Invalid token' });
   }
 };
