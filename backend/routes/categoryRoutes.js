@@ -1,13 +1,11 @@
-// backend/routes/categoryRoutes.js
-
 const express = require('express');
 const router = express.Router();
-const { getCategories, addCategory } = require('../controllers/categoryController');
+const categoryController = require('../controllers/categoryController');
 
-// Route to get all categories
-router.get('/', getCategories);
+// Route to fetch all categories
+router.get('/', categoryController.getCategories);
 
 // Route to add a new category
-router.post('/', addCategory);
+router.post('/', categoryController.addCategory);
 
 module.exports = router;

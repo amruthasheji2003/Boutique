@@ -9,8 +9,10 @@ const authRoutes = require('./routes/authRoutes');
 const adminRoutes = require('./routes/adminRoutes');
 const productRoutes = require('./routes/productRoutes');
 const profileRoutes = require('./routes/profileRoutes'); // Uncomment if you're using profile routes
-const categoryRoutes = require('./routes/categoryRoutes'); // Ensure this route exists and is correctly defined
+const categoryRoutes = require('./routes/categoryRoutes'); // Import category routes
 const authMiddleware = require('./middleware/authMiddleware');
+const subcategoryRoutes = require('./routes/subcategoryRoutes');
+
 
 // Initialize Express app
 const app = express();
@@ -39,6 +41,12 @@ app.use('/api/admin', adminRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/profile', authMiddleware, profileRoutes); // Uncomment if using profile routes
 app.use('/api/category', categoryRoutes); // Ensure categoryRoutes is valid
+app.use('/api/categories', categoryRoutes); // Ensure this matches your routing
+app.use('/api/subcategories', subcategoryRoutes);
+app.use('/api/subcategory', subcategoryRoutes);
+
+
+
 
 // Serve static files (uploads)
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
@@ -47,6 +55,7 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.get('/', (req, res) => {
   res.send('Server is running');
 });
+
 
 // Centralized error handling middleware
 app.use((err, req, res, next) => {

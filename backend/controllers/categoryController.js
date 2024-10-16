@@ -1,5 +1,3 @@
-// backend/controllers/categoryController.js
-
 const Category = require('../models/Category');
 
 // Fetch all categories
@@ -16,7 +14,10 @@ const getCategories = async (req, res) => {
 const addCategory = async (req, res) => {
   const { name } = req.body;
 
-  // Check if the category already exists
+  if (!name) {
+    return res.status(400).json({ message: 'Category name is required' });
+  }
+
   try {
     const existingCategory = await Category.findOne({ name });
     if (existingCategory) {
@@ -27,11 +28,10 @@ const addCategory = async (req, res) => {
     const savedCategory = await category.save();
     res.status(201).json(savedCategory);
   } catch (err) {
-    res.status(400).json({ message: 'Error adding category', error: err.message });
+    res.status(500).json({ message: 'Error adding category', error: err.message });
   }
 };
 
-// Export the controller functions
 module.exports = {
   getCategories,
   addCategory,
