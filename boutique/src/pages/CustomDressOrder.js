@@ -19,13 +19,14 @@ const CustomDressOrder = () => {
     }
   }, [location.state]);
 
+  // Navigate to specific pages when tabs are clicked
   const handleNavigate = (page) => navigate(page);
 
   const handleTabChange = (event, newValue) => {
     setValue(newValue);
     switch (newValue) {
       case 0:
-        handleNavigate('/fabric-selection');
+        handleNavigate('/fabric-selection'); // Navigates to Fabric Selection page
         break;
       case 1:
         handleNavigate('/color-selection');
@@ -40,6 +41,7 @@ const CustomDressOrder = () => {
         break;
     }
   };
+  
 
   const handleSubmit = () => alert('Order has been placed!');
 

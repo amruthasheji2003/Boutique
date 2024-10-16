@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { FaSearch } from 'react-icons/fa';
+import logo from '../assets/logo.png'; // Import the logo image
 
 const Home = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -51,9 +52,14 @@ const Home = () => {
       <header className='h-20 shadow-md bg-white fixed w-full z-40'>
         <div className='container mx-auto flex items-center justify-between px-4 h-full'>
           {/* Logo Section */}
-          <Link to="/" className='text-green text-3xl font-bold hover:text-pink-100 transition-colors duration-300'>
-            Tailor's Touch Boutique
-          </Link>
+          <div className='flex items-center'>
+            <Link to="/">
+              <img src={logo} alt="Tailor's Touch Logo" className="h-12 mr-4" /> {/* Logo added */}
+            </Link>
+            <Link to="/" className='text-green text-3xl font-bold hover:text-pink-100 transition-colors duration-300'>
+              Tailor's Touch Boutique
+            </Link>
+          </div>
           
           {/* Search Bar */}
           <div className='flex items-center w-full max-w-md mx-4'>

@@ -1,23 +1,42 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom'; // If using react-router
-import { FaShoppingCart, FaHeart } from 'react-icons/fa'; // Icons for Cart and Wishlist
+import { useNavigate } from 'react-router-dom';
+import { FaShoppingCart, FaHeart } from 'react-icons/fa';
 
 const BrowseCatalog = () => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedProduct, setSelectedProduct] = useState(null); // State for selected product
-  const [wishlist, setWishlist] = useState([]); // State for wishlist
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [wishlist, setWishlist] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState('');
+  const [subcategories, setSubcategories] = useState([]);
+  const [selectedSubcategory, setSelectedSubcategory] = useState('');
 
-  const navigate = useNavigate(); // Hook for navigation
+  const navigate = useNavigate();
 
-  // Fetch products from backend
-  const fetchProducts = async () => {
+  // Fetch categories from backend
+  const fetchCategories = async () => {
+    try {
+      const response = await axios.get('http://localhost:8080/api/categories');
+      setCategories(response.data);
+    } catch (error) {
+      setError('Error fetching categories');
+    }
+  };
+
+  // Fetch products with query parameters
+  const fetchProducts = async (category = '', subcategory = '', query = '') => {
     setLoading(true);
     try {
-      const response = await axios.get('http://localhost:8080/api/products');
+      let url = `http://localhost:8080/api/products?`;
+      // if (category) url += `category=${category}&`;
+      // if (subcategory) url += `subcategory=${subcategory}&`;
+      if (query) url += `search=${query}`;
+      
+      const response = await axios.get(url);
       setProducts(response.data);
     } catch (error) {
       setError('Error fetching products');
@@ -27,36 +46,61 @@ const BrowseCatalog = () => {
   };
 
   useEffect(() => {
+    fetchCategories();
     fetchProducts();
   }, []);
 
-  const filteredProducts = products.filter((product) =>
-    product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    product.category.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  // Update subcategories when category is selected
+  useEffect(() => {
+    const selectedCat = categories.find(cat => cat.name === selectedCategory);
+    setSubcategories(selectedCat ? selectedCat.subcategories : []);
+    setSelectedSubcategory('');
+    fetchProducts(selectedCategory);
+  }, [selectedCategory]);
 
-  // Function to handle product click
+  // Update products based on subcategory selection
+  useEffect(() => {
+    fetchProducts(selectedCategory, selectedSubcategory);
+  }, [selectedSubcategory]);
+
+  // Filter products based on search query
+  const handleSearch = (event) => {
+    const query = event.target.value;
+    setSearchQuery(query);
+    fetchProducts(selectedCategory, selectedSubcategory, query);
+  };
+
+  // Wishlist toggle function
+  const toggleWishlist = (productId) => {
+    setWishlist((prevWishlist) =>
+      prevWishlist.includes(productId)
+        ? prevWishlist.filter((id) => id !== productId)
+        : [...prevWishlist, productId]
+    );
+  };
+
+  // Handle category change
+  const handleCategoryChange = (event) => {
+    setSelectedCategory(event.target.value);
+  };
+
+  // Handle subcategory change
+  const handleSubcategoryChange = (event) => {
+    setSelectedSubcategory(event.target.value);
+  };
+
+  // Handle product click to view details
   const handleProductClick = (product) => {
     setSelectedProduct(product);
   };
 
-  // Toggle wishlist function
-  const toggleWishlist = (productId) => {
-    setWishlist((prevWishlist) =>
-      prevWishlist.includes(productId)
-        ? prevWishlist.filter((id) => id !== productId) // Remove from wishlist
-        : [...prevWishlist, productId] // Add to wishlist
-    );
-  };
-
-  // Back button handler
+  // Navigate back
   const handleBackClick = () => {
-    navigate(-1); // Use React Router's navigate to go back
+    navigate(-1);
   };
 
   return (
     <div className="container mx-auto p-6">
-      {/* Back Button as Header */}
       <div className="flex justify-start mb-6">
         <button
           onClick={handleBackClick}
@@ -68,74 +112,92 @@ const BrowseCatalog = () => {
 
       <h1 className="text-4xl font-bold text-center mb-6">Browse Catalog</h1>
 
-      {/* Search Products */}
+      <div className="mb-6 flex justify-center space-x-4">
+        <select
+          value={selectedCategory}
+          onChange={handleCategoryChange}
+          className="p-2 border border-gray-300 rounded-lg"
+        >
+          <option value="">Select Category</option>
+          {categories.map((category) => (
+            <option key={category.name} value={category.name}>
+              {category.name}
+            </option>
+          ))}
+        </select>
+
+        {subcategories.length > 0 && (
+          <select
+            value={selectedSubcategory}
+            onChange={handleSubcategoryChange}
+            className="p-2 border border-gray-300 rounded-lg"
+          >
+            <option value="">Select Subcategory</option>
+            {subcategories.map((subcategory) => (
+              <option key={subcategory} value={subcategory}>
+                {subcategory}
+              </option>
+            ))}
+          </select>
+        )}
+      </div>
+
       <input
         type="text"
         value={searchQuery}
-        onChange={(e) => setSearchQuery(e.target.value)}
-        placeholder="Search products by name or category..."
+        onChange={handleSearch}
+        placeholder="Search products by name..."
         className="block w-full p-2 border border-gray-300 rounded-lg mb-6"
       />
 
-      {/* Loading or Error Handling */}
       {loading ? (
         <div className="text-center">Loading products...</div>
       ) : error ? (
         <div className="text-red-500 text-center">{error}</div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {filteredProducts.length === 0 ? (
+          {products.length === 0 ? (
             <p className="text-center col-span-full">No products available</p>
           ) : (
-            filteredProducts.map((product) => (
+            products.map((product) => (
               <div
                 key={product._id}
                 className="catalog-item bg-white shadow-lg p-4 rounded-lg relative flex flex-col items-center"
-                onClick={() => handleProductClick(product)} // Click to view details
+                onClick={() => handleProductClick(product)}
               >
-                {/* Icons for Cart and Wishlist */}
                 <div className="absolute top-2 right-2 flex space-x-2">
-                  {/* Wishlist Icon */}
                   <FaHeart
                     className={`cursor-pointer text-2xl ${
                       wishlist.includes(product._id) ? 'text-red-600' : 'text-gray-500'
                     } hover:text-red-600`}
                     title="Add to Wishlist"
                     onClick={(e) => {
-                      e.stopPropagation(); // Prevents triggering the product click event
+                      e.stopPropagation();
                       toggleWishlist(product._id);
                     }}
                   />
-                  {/* Cart Icon */}
                   <FaShoppingCart
                     className="text-blue-500 hover:text-blue-600 cursor-pointer text-2xl"
                     title="Add to Cart"
                   />
                 </div>
-                
-                {/* Product Image */}
-                <div className="relative overflow-hidden rounded-lg mb-4">
-                  <img
-                    src={`http://localhost:8080/${product.image}`}
-                    alt={product.name}
-                    className="w-full h-40 object-cover mb-2"
-                  />
-                </div>
-                
-                {/* Product Details */}
+
+                <img
+                  src={`http://localhost:8080/${product.image}`}
+                  alt={product.name}
+                  className="w-full h-40 object-cover mb-2"
+                />
                 <h2 className="text-xl font-semibold mb-2 text-center">{product.name}</h2>
                 <p className="text-lg text-gray-600 mb-2">Rs.{product.price}</p>
-                <p className="text-sm text-gray-600 mb-2">Category:{product.category}</p>
+                <p className="text-sm text-gray-600 mb-2">Category: {product.category}</p>
                 <p className="text-sm text-gray-600 mb-2">Stock: {product.stock}</p>
                 <p className="text-sm text-gray-600 mb-2">{product.description}</p>
-
               </div>
             ))
           )}
         </div>
       )}
 
-      {/* Product Details Section */}
       {selectedProduct && (
         <div className="mt-8 p-6 border border-gray-300 rounded-lg bg-white">
           <h2 className="text-3xl font-bold mb-4">Product Details</h2>
@@ -150,20 +212,15 @@ const BrowseCatalog = () => {
             <div className="w-1/2">
               <h3 className="text-2xl font-semibold">{selectedProduct.name}</h3>
               <p className="text-lg text-gray-600">Rs.{selectedProduct.price}</p>
-              <p className="text-lg text-gray-600"> {selectedProduct.category}</p>
+              <p className="text-lg text-gray-600">Category: {selectedProduct.category}</p>
               <p className="text-lg text-gray-600">Stock: {selectedProduct.stock}</p>
               <p className="text-lg text-gray-600">{selectedProduct.description}</p>
 
-              {/* Buttons in the product details section */}
               <div className="mt-6 space-x-4">
-                <button
-                  className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600"
-                >
+                <button className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600">
                   Add to Cart
                 </button>
-                <button
-                  className="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600"
-                >
+                <button className="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600">
                   Add to Wishlist
                 </button>
               </div>

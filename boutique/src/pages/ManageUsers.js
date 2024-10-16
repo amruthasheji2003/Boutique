@@ -7,6 +7,8 @@ const ManageUsers = () => {
     const [users, setUsers] = useState([]); // Holds the full list of users
     const [filteredUsers, setFilteredUsers] = useState([]); // Holds the filtered list of users
     const [currentPage, setCurrentPage] = useState(1); // Holds the current page number
+    const [loading, setLoading] = useState(true); // State to handle loading
+    const [error, setError] = useState(null); // State to handle errors
     const usersPerPage = 6; // Define how many users to display per page
 
     const navigate = useNavigate(); // Hook to handle navigation
@@ -24,19 +26,27 @@ const ManageUsers = () => {
                 setUsers(response.data); // Set the full user data
                 setFilteredUsers(response.data); // Initially show all users
             } catch (error) {
-                console.error('Error fetching users:', error);
+                setError('Error fetching users'); // Set error state
+            } finally {
+                setLoading(false); // Stop loading after fetch
             }
         };
 
         fetchUsers();
     }, []);
 
-    // Handle the search button click
-    const handleSearch = () => {
-        // Filter users based on the search term (either email or phone number)
+    // Handle the search input change
+    const handleSearchInputChange = (e) => {
+        setSearchTerm(e.target.value);
+        handleSearch(e.target.value); // Automatically search on input change
+    };
+
+    // Handle the search functionality
+    const handleSearch = (term) => {
+        // Filter users based on the search term (matching from the start of email or phone number)
         const filtered = users.filter(user => 
-            user.email.toLowerCase().includes(searchTerm.toLowerCase()) || 
-            user.phoneNumber.includes(searchTerm)
+            user.email.toLowerCase().startsWith(term.toLowerCase()) || 
+            user.phoneNumber.startsWith(term)
         );
         setFilteredUsers(filtered); // Update the filtered users state
         setCurrentPage(1); // Reset to the first page after searching
@@ -61,16 +71,11 @@ const ManageUsers = () => {
         }
     };
 
+    if (loading) return <div className="text-center mt-10">Loading...</div>; // Loading state
+    if (error) return <div className="text-red-500 text-center mt-10">{error}</div>; // Error handling
+
     return (
         <div className="container mx-auto p-6 bg-white shadow-lg rounded-lg mt-8">
-            {/* Back button at the top */}
-            <button 
-                onClick={() => navigate(-1)} // Navigate back to the previous page
-                className="text-sm text-gray-700 bg-gray-100 hover:bg-gray-200 transition-all px-4 py-2 rounded mb-6"
-            >
-                Back
-            </button>
-
             <h1 className="text-3xl font-semibold mb-6 text-gray-800">Manage Users</h1>
 
             {/* Input field for searching users by email or phone number */}
@@ -79,30 +84,28 @@ const ManageUsers = () => {
                     type="text"
                     placeholder="Search users by email or phone number"
                     value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)} // Only set the search term
+                    onChange={handleSearchInputChange} // Update search term and trigger search on input change
                     className="border-2 border-gray-300 focus:ring-blue-500 focus:border-blue-500 p-3 rounded-lg flex-grow"
                 />
-                <button 
-                    onClick={handleSearch} // Search when the button is clicked
-                    className="bg-blue-500 hover:bg-blue-600 transition-all text-white px-5 py-3 rounded-lg shadow-md font-medium"
-                >
-                    Search
-                </button>
             </div>
 
             {/* Table to display the users */}
             <div className="overflow-x-auto">
-                <table className="min-w-full table-auto">
-                    <thead className="bg-blue-50">
+                <table className="min-w-full table-auto bg-white border border-gray-300 rounded-lg shadow-sm">
+                    <thead className="bg-blue-200">
                         <tr>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Phone Number</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">Email</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">Phone Number</th>
                         </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
                         {currentUsers.length > 0 ? (
                             currentUsers.map(user => (
-                                <tr key={user._id} className="hover:bg-gray-50 transition-all">
+                                <tr 
+                                    key={user._id} 
+                                    className="hover:bg-blue-100 transition-all cursor-pointer"
+                                    onClick={() => navigate(`/admin/users/${user._id}`)} // Navigate to user details on click
+                                >
                                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{user.email}</td>
                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{user.phoneNumber}</td>
                                 </tr>

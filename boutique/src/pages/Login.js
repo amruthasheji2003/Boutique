@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { FaSearch, FaArrowLeft } from 'react-icons/fa'; // Search and Back icons
 import backgroundImage from '../assets/loginimage.avif'; // Adjust the path as necessary
+import logo from '../assets/logo.png';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -8,6 +10,7 @@ const Login = () => {
   const [emailError, setEmailError] = useState('');
   const [passwordError, setPasswordError] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
+  const [searchQuery, setSearchQuery] = useState(''); // State for search bar
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
@@ -16,7 +19,6 @@ const Login = () => {
     setPasswordError('');
     setSuccessMessage('');
 
-    // Validate inputs
     let valid = true;
     if (!email) {
       setEmailError('Email is required.');
@@ -30,7 +32,6 @@ const Login = () => {
     if (!valid) return;
 
     try {
-      // First, attempt to log in as an admin
       const adminResponse = await fetch('http://localhost:8080/api/admin/login', {
         method: 'POST',
         headers: {
@@ -41,18 +42,15 @@ const Login = () => {
 
       const adminData = await adminResponse.json();
 
-      if (adminResponse.status === 200 && adminData.admin) { // If admin login is successful
-        console.log('Admin login successful', adminData);
-        localStorage.setItem('token', adminData.token); // Store the JWT token for admin
+      if (adminResponse.status === 200 && adminData.admin) {
+        localStorage.setItem('token', adminData.token);
         setSuccessMessage('Admin login successful! Redirecting...');
-
         setTimeout(() => {
-          navigate('/admin'); // Navigate to admin dashboard
+          navigate('/admin');
         }, 2000);
-        return; // Exit function after admin login
+        return;
       }
 
-      // If admin login fails, try regular user login
       const userResponse = await fetch('http://localhost:8080/api/auth/login', {
         method: 'POST',
         headers: {
@@ -63,20 +61,16 @@ const Login = () => {
 
       const userData = await userResponse.json();
 
-      if (userResponse.status === 200) { // If user login is successful
-        console.log('User login successful', userData);
-        localStorage.setItem('token', userData.token); // Store the JWT token for user
+      if (userResponse.status === 200) {
+        localStorage.setItem('token', userData.token);
         setSuccessMessage('User login successful! Redirecting...');
-
         setTimeout(() => {
-          navigate('/Customer'); // Navigate to customer page
+          navigate('/Customer');
         }, 2000);
       } else {
-        // Show error message returned from the server
         setEmailError(userData.message || 'Login failed');
       }
     } catch (error) {
-      console.error('Login error:', error);
       setEmailError('An error occurred. Please try again.');
     }
   };
@@ -89,29 +83,54 @@ const Login = () => {
     navigate('/forgot-password');
   };
 
-  const handleBackButtonClick = () => {
-    navigate('/'); // Navigate to the home page
+  const handleSearch = () => {
+    console.log('Search query:', searchQuery); // Handle search action
+  };
+
+  const handleBack = () => {
+    navigate(-1); // Go back to the previous page
   };
 
   return (
     <div>
       {/* Header Section */}
-      <header className='h-16 shadow-md bg-yellow-900 fixed w-full z-40'>
-        <div className='h-full container mx-auto flex items-center px-4 justify-between'>
-          <div className='flex items-center gap-4'>
-            <Link to="/" className='text-green text-2xl font-bold hover:text-pink-100 transition-colors duration-300'>
+      <header className='h-20 shadow-md bg-white fixed w-full z-30'>
+        <div className='container mx-auto flex items-center justify-between px-4 h-full'>
+          {/* Logo Section */}
+          <div className='flex items-center'>
+            <Link to="/">
+              <img src={logo} alt="Tailor's Touch Logo" className="h-12 mr-2" />
+            </Link>
+            <Link to="/" className='text-green-600 text-3xl font-bold hover:text-pink-500 transition-colors duration-300'>
               Tailor's Touch Boutique
             </Link>
-            <nav className='hidden lg:flex items-center space-x-40 ml-20'>
-              <Link to="/" className='text-white text-lg hover:text-blue-300 transition-colors duration-300'>Home</Link>
-              <Link to="/featured-products" className='text-white text-lg hover:text-blue-300 transition-colors duration-300'>Featured Products</Link>
-              <Link to="/contact-us" className='text-white text-lg hover:text-blue-300 transition-colors duration-300'>Contact Us</Link>
-            </nav>
           </div>
+
+          {/* Navigation Links */}
+          <div className='flex items-center space-x-20'>
+            <Link to="/" className='text-gray-700 hover:text-blue-500 transition-colors duration-300'>Home</Link>
+            <Link to="/contact-us" className='text-gray-700 hover:text-blue-500 transition-colors duration-300'>Contact Us</Link>
+            <Link to="/about-us" className='text-gray-700 hover:text-blue-500 transition-colors duration-300'>About Us</Link>
+          </div>
+
           {/* Back Button */}
-          <button onClick={handleBackButtonClick} className='text-white ml-4'>
-            Back
+          <button onClick={handleBack} className='text-gray-600 hover:text-gray-900 transition-colors duration-300'>
+            <FaArrowLeft size={20} />
           </button>
+
+          {/* Search Bar
+          <div className='flex items-center space-x-4'>
+            <div className='relative'>
+              <input
+                type="text"
+                placeholder="Search"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className='border border-gray-300 rounded-full px-4 py-2 focus:outline-none'
+              />
+              <FaSearch className='absolute top-1/2 right-2 transform -translate-y-1/2 text-gray-400' />
+            </div>
+          </div> */}
         </div>
       </header>
 
@@ -249,24 +268,20 @@ const styles = {
     borderRadius: '4px',
     cursor: 'pointer',
     fontSize: '16px',
-    marginTop: '10px',
     width: '100%',
+    marginTop: '10px',
   },
   forgotPassword: {
-    textAlign: 'center',
     color: '#007bff',
     cursor: 'pointer',
+    textAlign: 'center',
     marginTop: '10px',
   },
   signupButton: {
+    color: '#007bff',
+    textAlign: 'center',
     display: 'block',
     marginTop: '10px',
-    padding: '10px',
-    backgroundColor: '#28a745',
-    color: '#fff',
-    textAlign: 'center',
-    borderRadius: '4px',
-    textDecoration: 'none',
   },
 };
 

@@ -1,20 +1,36 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';  // Import useNavigate
+import { useNavigate } from 'react-router-dom';
 
 const ManageProducts = () => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [newProduct, setNewProduct] = useState({ name: '', price: '', category: '', description: '', stock: '' });
+  const [newProduct, setNewProduct] = useState({
+    name: '',
+    price: '',
+    category: '',
+    subcategory: '',
+    description: '',
+    stock: '',
+  });
+  const [batchDetails, setBatchDetails] = useState({
+    batchId: '',
+    productDate: '',
+    quantity: '',
+  });
   const [editProduct, setEditProduct] = useState(null);
   const [error, setError] = useState('');
   const [selectedImage, setSelectedImage] = useState(null);
   const [previewImage, setPreviewImage] = useState(null);
+  const [searchQuery, setSearchQuery] = useState(''); // Define searchQuery state
 
-  const navigate = useNavigate();  // Initialize navigate function
+  const navigate = useNavigate();
 
-  // Fetch products from the backend
+  const categories = {
+    'Men\'s Wear': ['Shirts', 'Trousers', 'Suits', 'Kurta', 'Sherwani', 'Blazers'],
+    'Women\'s Wear': ['Salwar Suits', 'Lehenga', 'Churidars', 'Kurtis', 'Gowns', 'Blouses', 'Frocks', 'Skirts', 'Skirt with Top'],
+  };
+
   const fetchProducts = async () => {
     setLoading(true);
     try {
@@ -31,80 +47,91 @@ const ManageProducts = () => {
     fetchProducts();
   }, []);
 
-  // Handle input change for both adding and editing products
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     if (editProduct) {
       setEditProduct({ ...editProduct, [name]: value });
-    } else {
+    } else if (name in newProduct) {
       setNewProduct({ ...newProduct, [name]: value });
+    } else {
+      setBatchDetails({ ...batchDetails, [name]: value });
     }
   };
 
-  // Handle image selection and preview
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     setSelectedImage(file);
     setPreviewImage(URL.createObjectURL(file));
   };
 
-  // Handle adding new product
   const handleAddProduct = async (e) => {
     e.preventDefault();
+
+    const uniqueBatchId = `BATCH-${Date.now()}`;
+    const currentDate = new Date().toISOString().split('T')[0];
+
+    if (newProduct.price < 0 || newProduct.stock < 0) {
+      setError('Price and Stock must be non-negative numbers.');
+      return;
+    }
+
     const formData = new FormData();
     formData.append('name', newProduct.name);
     formData.append('price', newProduct.price);
     formData.append('category', newProduct.category);
+    formData.append('subcategory', newProduct.subcategory);
     formData.append('stock', newProduct.stock);
     formData.append('description', newProduct.description);
+    formData.append('batchId', uniqueBatchId);
+    formData.append('productDate', currentDate);
+    formData.append('quantity', batchDetails.quantity);
     if (selectedImage) {
       formData.append('image', selectedImage);
     }
 
     try {
       await axios.post('http://localhost:8080/api/products', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
+        headers: { 'Content-Type': 'multipart/form-data' },
       });
-      setNewProduct({ name: '', price: '', category: '', description: '', stock: '' });
-      setSelectedImage(null);
-      setPreviewImage(null);
+      resetForm();
       fetchProducts();
     } catch (error) {
       setError(error.response?.data?.message || 'Error adding product');
     }
   };
 
-  // Handle editing product
   const handleEditProduct = async (e) => {
     e.preventDefault();
+
+    if (editProduct.price < 0 || editProduct.stock < 0) {
+      setError('Price and Stock must be non-negative numbers.');
+      return;
+    }
+
     const formData = new FormData();
     formData.append('name', editProduct.name);
     formData.append('price', editProduct.price);
     formData.append('category', editProduct.category);
+    formData.append('subcategory', editProduct.subcategory);
     formData.append('stock', editProduct.stock);
     formData.append('description', editProduct.description);
+    formData.append('batchId', batchDetails.batchId);
+    formData.append('productDate', batchDetails.productDate);
     if (selectedImage) {
       formData.append('image', selectedImage);
     }
 
     try {
       await axios.put(`http://localhost:8080/api/products/${editProduct._id}`, formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
+        headers: { 'Content-Type': 'multipart/form-data' },
       });
-      setEditProduct(null);
-      setSelectedImage(null);
-      setPreviewImage(null);
+      resetForm();
       fetchProducts();
     } catch (error) {
       setError(error.response?.data?.message || 'Error updating product');
     }
   };
 
-  // Handle product deletion
   const handleDeleteProduct = async (id) => {
     if (window.confirm('Are you sure you want to delete this product?')) {
       try {
@@ -116,7 +143,15 @@ const ManageProducts = () => {
     }
   };
 
-  // Filter products based on search query
+  const resetForm = () => {
+    setNewProduct({ name: '', price: '', category: '', subcategory: '', description: '', stock: '' });
+    setBatchDetails({ batchId: '', productDate: '', quantity: '' });
+    setEditProduct(null);
+    setSelectedImage(null);
+    setPreviewImage(null);
+    setError('');
+  };
+
   const filteredProducts = products.filter((product) =>
     product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     product.category.toLowerCase().includes(searchQuery.toLowerCase())
@@ -126,97 +161,56 @@ const ManageProducts = () => {
     <div className="container mx-auto p-4">
       <h1 className="text-center text-3xl font-bold mb-6">Manage Products</h1>
 
-      {/* Back Button */}
-      <button
-        onClick={() => navigate(-1)}  // Navigate back to the previous page
-        className="bg-gray-500 text-white px-4 py-2 rounded mb-6 hover:bg-gray-600"
-      >
-        Back
-      </button>
-
-      {/* Error display */}
       {error && <p className="text-red-500 mb-4">{error}</p>}
 
-      {/* Add or Edit Product Form */}
+      {/* Add/Edit Form */}
       <div className="bg-gray-100 p-6 mb-6 rounded shadow-lg">
         <h2 className="text-2xl mb-4">{editProduct ? 'Edit Product' : 'Add New Product'}</h2>
         <form onSubmit={editProduct ? handleEditProduct : handleAddProduct} encType="multipart/form-data" className="space-y-4">
-          <input
-            type="text"
-            name="name"
-            value={editProduct ? editProduct.name : newProduct.name}
-            onChange={handleInputChange}
-            placeholder="Product Name"
-            required
-            className="block w-full p-3 border border-gray-300 rounded"
-          />
-          <input
-            type="number"
-            name="price"
-            value={editProduct ? editProduct.price : newProduct.price}
-            onChange={handleInputChange}
-            placeholder="Price"
-            required
-            className="block w-full p-3 border border-gray-300 rounded"
-          />
-          <input
-            type="text"
-            name="category"
-            value={editProduct ? editProduct.category : newProduct.category}
-            onChange={handleInputChange}
-            placeholder="Category"
-            required
-            className="block w-full p-3 border border-gray-300 rounded"
-          />
-          <input
-            type="number"
-            name="stock"
-            value={editProduct ? editProduct.stock : newProduct.stock}
-            onChange={handleInputChange}
-            placeholder="Stock"
-            required
-            className="block w-full p-3 border border-gray-300 rounded"
-          />
-          <textarea
-            name="description"
-            value={editProduct ? editProduct.description : newProduct.description}
-            onChange={handleInputChange}
-            placeholder="Description"
-            required
-            className="block w-full p-3 border border-gray-300 rounded resize-none h-24"
-          />
-          <input
-            type="file"
-            accept="image/*"
-            onChange={handleImageChange}
-            className="block w-full p-3 border border-gray-300 rounded"
-          />
-          {previewImage && (
-            <img src={previewImage} alt="Preview" className="w-48 h-48 object-contain mb-4 rounded-md shadow" />
-          )}
-          <button type="submit" className="bg-green-500 text-white p-3 rounded w-full hover:bg-green-600">
+          {/* Form Fields */}
+          <input type="text" name="name" value={editProduct ? editProduct.name : newProduct.name} onChange={handleInputChange} placeholder="Product Name" required className="block w-full p-3 border border-gray-300 rounded" />
+          <input type="number" name="price" value={editProduct ? editProduct.price : newProduct.price} onChange={handleInputChange} placeholder="Price" required className="block w-full p-3 border border-gray-300 rounded" min="0" />
+          <select name="category" value={editProduct ? editProduct.category : newProduct.category} onChange={handleInputChange} required className="block w-full p-3 border border-gray-300 rounded">
+            <option value="">Select Category</option>
+            {Object.keys(categories).map((category) => (
+              <option key={category} value={category}>{category}</option>
+            ))}
+          </select>
+          <select name="subcategory" value={editProduct ? editProduct.subcategory : newProduct.subcategory} onChange={handleInputChange} required className="block w-full p-3 border border-gray-300 rounded">
+            <option value="">Select Subcategory</option>
+            {(categories[newProduct.category] || []).map((subcategory) => (
+              <option key={subcategory} value={subcategory}>{subcategory}</option>
+            ))}
+          </select>
+          <input type="number" name="stock" value={editProduct ? editProduct.stock : newProduct.stock} onChange={handleInputChange} placeholder="Stock" required className="block w-full p-3 border border-gray-300 rounded" min="0" />
+          <textarea name="description" value={editProduct ? editProduct.description : newProduct.description} onChange={handleInputChange} placeholder="Description" required className="block w-full p-3 border border-gray-300 rounded"></textarea>
+
+          {/* Batch Details */}
+          <h3 className="text-lg font-bold">Batch Details</h3>
+          <input type="text" name="batchId" value={editProduct ? batchDetails.batchId : `BATCH-${Date.now()}`} readOnly className="block w-full p-3 border border-gray-300 rounded bg-gray-100" />
+          <input type="date" name="productDate" value={batchDetails.productDate} onChange={handleInputChange} required className="block w-full p-3 border border-gray-300 rounded" />
+          <input type="number" name="quantity" value={batchDetails.quantity} onChange={handleInputChange} placeholder="Batch Quantity" required className="block w-full p-3 border border-gray-300 rounded" min="0" />
+
+          {/* Image Upload */}
+          <input type="file" onChange={handleImageChange} className="block w-full p-3 border border-gray-300 rounded" />
+          {previewImage && <img src={previewImage} alt="Preview" className="mt-4 h-32 w-32 object-cover rounded" />}
+
+          <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
             {editProduct ? 'Update Product' : 'Add Product'}
           </button>
-          {editProduct && (
-            <button
-              type="button"
-              onClick={() => { setEditProduct(null); setPreviewImage(null); }}
-              className="bg-red-500 text-white p-3 rounded w-full mt-4 hover:bg-red-600"
-            >
-              Cancel Edit
-            </button>
-          )}
         </form>
       </div>
 
-      {/* Search Products */}
-      <input
-        type="text"
-        value={searchQuery}
-        onChange={(e) => setSearchQuery(e.target.value)}
-        placeholder="Search products by name or category..."
-        className="block w-full p-3 border border-gray-300 rounded mb-6"
-      />
+      {/* Search */}
+      <div className="flex justify-center mb-6">
+        <input
+          type="text"
+          placeholder="Search products..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="p-3 border border-gray-300 rounded w-full max-w-lg"
+        />
+      </div>
 
       {/* Display Products in Grid */}
       {loading ? (
@@ -258,5 +252,6 @@ const ManageProducts = () => {
     </div>
   );
 };
+
 
 export default ManageProducts;

@@ -19,6 +19,9 @@ import Profile from '../pages/Profile';
 import AdminPage from '../pages/AdminPage';
 import ManageUsers from '../pages/ManageUsers';
 import ManageProducts from '../pages/ManageProducts';
+import MaterialManagement from '../pages/MaterialManagement';
+import ManageCategories from '../pages/ManageCategories';
+import ManageSubcategories from '../pages/ManageSubcategories';
 
 const router = createBrowserRouter([
     {
@@ -41,14 +44,18 @@ const router = createBrowserRouter([
             { path: "cart", element: <Cart /> },
             { path: "dress-style-selection", element: <DressStyleSelection /> },
             { path: "forgot-password", element: <ForgotPassword /> },
-
+            { path: "manage-materials", element: <MaterialManagement /> },
             // Admin routes
             {
                 path: "admin",
                 element: <AdminPage />,
+                children: [
+                    { path: "manage-users", element: <ManageUsers /> }, // Nested route
+                    { path: "manage-products", element: <ManageProducts /> },
+                    { path: "manage-categories", element: <ManageCategories /> },
+                    { path: "manage-subcategories", element: <ManageSubcategories /> }, // Nested route
+                ]
             },
-            { path: "manage-users", element: <ManageUsers/> },
-            { path: "manage-products", element: <ManageProducts/> },
             // Other routes...
         ]
     }
