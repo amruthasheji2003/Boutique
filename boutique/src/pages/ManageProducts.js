@@ -39,28 +39,20 @@ const ManageProducts = () => {
     setLoading(true);
     try {
       const response = await axios.get('http://localhost:8080/api/products');
-      console.log('Fetched products:', response.data); // Log fetched products
+      console.log(response.data); // Log the response
       setProducts(response.data);
     } catch (error) {
-      console.error('Error fetching products:', error); // Log error for debugging
       setError('Error fetching products');
     } finally {
       setLoading(false);
     }
   };
-
   // Fetch categories
   const fetchCategories = async () => {
     try {
       const response = await axios.get('http://localhost:8080/api/categories');
-      if (response.data && Array.isArray(response.data)) {
-        setCategories(response.data);
-      } else {
-        console.error('Unexpected categories data format:', response.data);
-        setError('Error fetching categories');
-      }
+      setCategories(response.data);
     } catch (error) {
-      console.error('Error fetching categories:', error);
       setError('Error fetching categories');
     }
   };
@@ -71,24 +63,15 @@ const ManageProducts = () => {
       setSubcategories([]); // Clear subcategories if no category is selected
       return;
     }
-  
+
     try {
       const response = await axios.get(`http://localhost:8080/api/subcategories/${category}`);
-      
-      console.log('Subcategories response:', response.data); // Log the response data
-  
-      if (Array.isArray(response.data)) {
-        setSubcategories(response.data); // Set the subcategories
-      } else {
-        console.error('Unexpected subcategories data format:', response.data);
-        setError('Error fetching subcategories');
-      }
+      setSubcategories(response.data);
     } catch (error) {
-      console.error('Error fetching subcategories:', error);
       setError('Error fetching subcategories');
     }
   };
-  
+
   // Handle input change for form
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -105,6 +88,12 @@ const ManageProducts = () => {
         return updatedProduct;
       });
     }
+  };
+
+  // Handle batch input changes
+  const handleBatchInputChange = (e) => {
+    const { name, value } = e.target;
+    setBatchDetails((prev) => ({ ...prev, [name]: value }));
   };
 
   // Handle image upload
@@ -266,12 +255,21 @@ const ManageProducts = () => {
             onChange={handleInputChange}
             required
             className="block w-full p-3 border border-gray-300 rounded"
+            disabled={!subcategories.length}
           >
             <option value="">Select Subcategory</option>
             {subcategories.map((subcategory) => (
               <option key={subcategory._id} value={subcategory._id}>{subcategory.name}</option>
             ))}
           </select>
+          <textarea
+            name="description"
+            value={editProduct ? editProduct.description : newProduct.description}
+            onChange={handleInputChange}
+            placeholder="Product Description"
+            className="block w-full p-3 border border-gray-300 rounded"
+          />
+
           <input
             type="number"
             name="stock"
@@ -282,61 +280,120 @@ const ManageProducts = () => {
             className="block w-full p-3 border border-gray-300 rounded"
             min="0"
           />
-          <textarea
-            name="description"
-            value={editProduct ? editProduct.description : newProduct.description}
-            onChange={handleInputChange}
-            placeholder="Product Description"
+
+          {/* Batch Details */}
+          <input
+            type="text"
+            name="batchId"
+            value={batchDetails.batchId}
+            onChange={handleBatchInputChange}
+            placeholder="Batch ID (auto-generated)"
+            disabled
+            className="block w-full p-3 border border-gray-300 rounded"
+          />
+          <input
+            type="date"
+            name="productDate"
+            value={batchDetails.productDate}
+            onChange={handleBatchInputChange}
+            placeholder="Product Date"
             required
             className="block w-full p-3 border border-gray-300 rounded"
           />
-          <input type="file" onChange={handleImageChange} className="block w-full" />
-          {previewImage && <img src={previewImage} alt="Preview" className="my-2 h-32 object-cover" />}
-          <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded">
+          <input
+            type="number"
+            name="quantity"
+            value={batchDetails.quantity}
+            onChange={handleBatchInputChange}
+            placeholder="Batch Quantity"
+            required
+            className="block w-full p-3 border border-gray-300 rounded"
+            min="0"
+          />
+
+          {/* Image Upload */}
+          <div>
+            <input type="file" onChange={handleImageChange} className="mb-4" />
+            {previewImage && <img src={previewImage} alt="Preview" className="w-24 h-24 object-cover rounded" />}
+          </div>
+
+          {/* Submit Button */}
+          <button
+            type="submit"
+            className="bg-blue-500 text-white py-3 px-6 rounded hover:bg-blue-700 transition"
+          >
             {editProduct ? 'Update Product' : 'Add Product'}
           </button>
+
+          {/* Cancel Button */}
+          {editProduct && (
+            <button
+              type="button"
+              onClick={resetForm}
+              className="ml-4 bg-gray-500 text-white py-3 px-6 rounded hover:bg-gray-700 transition"
+            >
+              Cancel Edit
+            </button>
+          )}
         </form>
       </div>
 
-      {/* Search Bar */}
-      <div className="mb-4">
+      {/* Product List */}
+      <div>
         <input
           type="text"
-          placeholder="Search Products..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="block w-full p-3 border border-gray-300 rounded"
+          placeholder="Search by product name or category"
+          className="block w-full p-3 mb-6 border border-gray-300 rounded"
         />
-      </div>
 
-      {/* Product Table */}
-      <table className="min-w-full bg-white border">
-        <thead>
-          <tr className="border-b">
-            <th className="text-left p-2">Name</th>
-            <th className="text-left p-2">Price</th>
-            <th className="text-left p-2">Category</th>
-            <th className="text-left p-2">Subcategory</th>
-            <th className="text-left p-2">Stock</th>
-            <th className="text-left p-2">Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {filteredProducts.map((product) => (
-            <tr key={product._id} className="border-b">
-              <td className="p-2">{product.name}</td>
-              <td className="p-2">${product.price}</td>
-              <td className="p-2">{product.category}</td>
-              <td className="p-2">{product.subcategory}</td>
-              <td className="p-2">{product.stock}</td>
-              <td className="p-2">
-                <button onClick={() => setEditProduct(product)} className="text-blue-500 mr-2">Edit</button>
-                <button onClick={() => handleDeleteProduct(product._id)} className="text-red-500">Delete</button>
-              </td>
+        <table className="table-auto w-full bg-white rounded shadow-lg">
+          <thead>
+            <tr className="bg-gray-200 text-gray-700">
+              <th className="px-4 py-2">Name</th>
+              <th className="px-4 py-2">Category</th>
+              <th className="px-4 py-2">Subcategory</th>
+              <th className="px-4 py-2">Price</th>
+              <th className="px-4 py-2">Stock</th>
+              <th className="px-4 py-2">Actions</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {filteredProducts.map((product) => (
+              <tr key={product._id}>
+                <td className="border px-4 py-2">{product.name}</td>
+                <td className="border px-4 py-2">{product.category}</td>
+                <td className="border px-4 py-2">{product.subcategory}</td>
+                <td className="border px-4 py-2">{product.price}</td>
+                <td className="border px-4 py-2">{product.stock}</td>
+                <td className="border px-4 py-2">
+                  <button
+                    onClick={() => {
+                      setEditProduct(product);
+                      setBatchDetails({
+                        batchId: product.batchId,
+                        productDate: product.productDate,
+                        quantity: product.quantity,
+                      });
+                      setPreviewImage(product.image);
+                    }}
+                    className="bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600 transition"
+                  >
+                    Edit
+                  </button>
+                  <button
+                    onClick={() => handleDeleteProduct(product._id)}
+                    className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 transition ml-2"
+                  >
+                    Delete
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 };

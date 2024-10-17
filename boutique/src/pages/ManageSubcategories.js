@@ -120,25 +120,36 @@ const ManageSubcategories = () => {
     fetchCategories();
   }, []);
 
-  // Fetch subcategories whenever the selected category changes
   useEffect(() => {
-    const fetchSubcategories = async () => {
-      if (selectedCategory) {
-        try {
-          const response = await axios.get(`http://localhost:8080/api/subcategories?category=${selectedCategory}`);
-          setSubcategories((prev) => ({
-            ...prev,
-            [selectedCategory]: response.data, // Store full subcategory objects
+    const fetchSubcategories = async (category) => {
+      if (!category) {
+        setSubcategories([]); // Clear subcategories if no category is selected
+        return;
+      }
+  
+      try {
+        const response = await axios.get(`http://localhost:8080/api/subcategories/${category}`);
+  
+        console.log('Subcategories response:', response.data); // Log the response data
+  
+        if (Array.isArray(response.data)) {
+          setSubcategories((prevState) => ({
+            ...prevState,
+            [category]: response.data, // Store the subcategories with the selected category as key
           }));
-        } catch (err) {
+        } else {
+          console.error('Unexpected subcategories data format:', response.data);
           setError('Error fetching subcategories');
         }
+      } catch (error) {
+        console.error('Error fetching subcategories:', error);
+        setError('Error fetching subcategories');
       }
     };
-
-    fetchSubcategories();
+  
+    fetchSubcategories(selectedCategory); // Pass the selectedCategory to the function
   }, [selectedCategory]);
-
+  
   // Handle Category Change
   const handleCategoryChange = (event) => {
     setSelectedCategory(event.target.value);
