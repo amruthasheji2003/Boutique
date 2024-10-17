@@ -1,8 +1,8 @@
 const Subcategory = require('../models/Subcategory');
 
-// Get all subcategories by category
+// Get all subcategories by category ID
 exports.getSubcategoriesByCategory = async (req, res) => {
-  const { category } = req.query;
+  const { category } = req.params; // Use path parameter instead of query
 
   try {
     const subcategories = await Subcategory.find({ category });

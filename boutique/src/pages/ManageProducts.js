@@ -68,14 +68,17 @@ const ManageProducts = () => {
   // Fetch subcategories based on selected category
   const fetchSubcategories = async (category) => {
     if (!category) {
-      setSubcategories([]); // Clear if no category is selected
+      setSubcategories([]); // Clear subcategories if no category is selected
       return;
     }
+  
     try {
       const response = await axios.get(`http://localhost:8080/api/subcategories/${category}`);
-      console.log('Subcategories response:', response.data); // Log response
+      
+      console.log('Subcategories response:', response.data); // Log the response data
+  
       if (Array.isArray(response.data)) {
-        setSubcategories(response.data);
+        setSubcategories(response.data); // Set the subcategories
       } else {
         console.error('Unexpected subcategories data format:', response.data);
         setError('Error fetching subcategories');
@@ -85,7 +88,7 @@ const ManageProducts = () => {
       setError('Error fetching subcategories');
     }
   };
-
+  
   // Handle input change for form
   const handleInputChange = (e) => {
     const { name, value } = e.target;
