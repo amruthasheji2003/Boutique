@@ -6,10 +6,6 @@ const productSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  price: {
-    type: Number,
-    required: true,
-  },
   category: {
     type: String,
     required: true,
@@ -30,20 +26,10 @@ const productSchema = new mongoose.Schema({
     type: Number, // Number of units available
     required: true,
   },
-  batch: {
-    batchId: {
-      type: String,
-      required: true,
-    },
-    productDate: {
-      type: Date,
-      required: true,
-    },
-    quantity: {
-      type: Number,
-      required: true,
-    },
-  },
+  batches: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Batch', // Reference to the Batch model
+  }],
 });
 
 // Check if the Product model already exists before defining it

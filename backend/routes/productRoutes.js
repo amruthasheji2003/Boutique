@@ -1,16 +1,21 @@
 const express = require('express');
-const upload = require('../config/multer'); // Adjust the path based on your directory structure
-const {
-  getProducts,
-  addProduct,
-  updateProduct,
-  deleteProduct,
+const { 
+  createProduct, 
+  getProducts, 
+  getProductById, 
+  updateProduct, 
+  deleteProduct 
 } = require('../controllers/productController');
+const multer = require('multer');
+const upload = multer({ dest: 'uploads/' }); // Adjust the path as needed
 
 const router = express.Router();
-router.get('/', getProducts);
-router.post('/', upload.single('image'), addProduct);
-router.put('/:id', upload.single('image'), updateProduct);
-router.delete('/:id', deleteProduct);
+
+// Routes for product management
+router.post('/', upload.single('image'), createProduct); // POST /api/products
+router.get('/', getProducts); // GET /api/products
+router.get('/:id', getProductById); // GET /api/products/:id
+router.put('/:id', upload.single('image'), updateProduct); // PUT /api/products/:id
+router.delete('/:id', deleteProduct); // DELETE /api/products/:id
 
 module.exports = router;

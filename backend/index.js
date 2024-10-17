@@ -12,6 +12,7 @@ const profileRoutes = require('./routes/profileRoutes'); // Uncomment if you're 
 const categoryRoutes = require('./routes/categoryRoutes'); // Import category routes
 const authMiddleware = require('./middleware/authMiddleware');
 const subcategoryRoutes = require('./routes/subcategoryRoutes');
+const batchRoutes = require('./routes/batchRoutes');
 
 
 // Initialize Express app
@@ -43,6 +44,9 @@ app.use('/api/profile', authMiddleware, profileRoutes); // Uncomment if using pr
 app.use('/api/category', categoryRoutes); // Ensure categoryRoutes is valid
 app.use('/api/categories', categoryRoutes); // Ensure this matches your routing
 app.use('/api/subcategories', subcategoryRoutes);
+app.use('/api/subcategory', subcategoryRoutes);
+app.use('/api/batches', batchRoutes);
+
 
 
 
