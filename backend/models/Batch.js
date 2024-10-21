@@ -1,32 +1,40 @@
-const mongoose = require('mongoose');
+// const mongoose = require('mongoose');
 
-// Define the batch schema
-const batchSchema = new mongoose.Schema({
-  batchId: {
-    type: String,
-    required: true,
-    unique: true,
-  },
-  product: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Product',
-    required: true,
-  },
-  productDate: {
-    type: Date,
-    required: true,
-  },
-  quantity: {
-    type: Number,
-    required: true,
-  },
-  price: {
-    type: Number,
-    required: true,
-  },
-});
+// const batchSchema = new mongoose.Schema({
+//   product: {
+//     type: mongoose.Schema.Types.ObjectId,
+//     ref: 'Product',
+//     required: true,
+//   },
+//   batchId: {
+//     type: String,
+//     required: true,
+//   },
+//   productDate: {
+//     type: Date,
+//     required: true,
+//   },
+//   quality: {
+//     type: String,
+//     enum: ['A', 'B', 'C'],
+//     default: 'A',
+//   },
+//   price: {
+//     type: Number,
+//     required: true,
+//   },
+//   quantity: {
+//     type: Number,
+//     required: true,
+//   },
+//   discount: {
+//     type: Number,
+//     default: 0,
+//   },
+//   finalPrice: {
+//     type: Number,
+//     required: true,
+//   },
+// }, { timestamps: true });
 
-// Check if the Batch model already exists before defining it
-const Batch = mongoose.models.Batch || mongoose.model('Batch', batchSchema);
-
-module.exports = Batch;
+// module.exports = mongoose.model('Batch', batchSchema);

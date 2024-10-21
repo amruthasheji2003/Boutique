@@ -1,233 +1,264 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
-import { FaShoppingCart, FaHeart } from 'react-icons/fa';
+import { useNavigate, Link } from 'react-router-dom';
+import logo from '../assets/logo.png';
+
+const API_URL = 'http://localhost:8080';
+
+const formatPrice = (price) => {
+  return `₹${new Intl.NumberFormat('en-IN', {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  }).format(price)}`;
+};
 
 const BrowseCatalog = () => {
   const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedProduct, setSelectedProduct] = useState(null);
-  const [wishlist, setWishlist] = useState([]);
   const [categories, setCategories] = useState([]);
-  const [selectedCategory, setSelectedCategory] = useState('');
   const [subcategories, setSubcategories] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState('');
   const [selectedSubcategory, setSelectedSubcategory] = useState('');
-
+  const [searchTerm, setSearchTerm] = useState('');
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [cart, setCart] = useState([]);
   const navigate = useNavigate();
 
-  // Fetch categories from backend
-  const fetchCategories = async () => {
-    try {
-      const response = await axios.get('http://localhost:8080/api/categories');
-      setCategories(response.data);
-    } catch (error) {
-      setError('Error fetching categories');
-    }
-  };
+  useEffect(() => {
+    fetchProducts();
+    fetchCategories();
+    fetchCart();
+  }, []);
 
-  // Fetch products with query parameters
-  const fetchProducts = async (category = '', subcategory = '', query = '') => {
-    setLoading(true);
+  useEffect(() => {
+    if (selectedCategory) {
+      fetchSubcategories(selectedCategory);
+    } else {
+      setSubcategories([]);
+      setSelectedSubcategory('');
+    }
+  }, [selectedCategory]);
+
+  const fetchProducts = async () => {
     try {
-      let url = `http://localhost:8080/api/products?`;
-      // if (category) url += `category=${category}&`;
-      // if (subcategory) url += `subcategory=${subcategory}&`;
-      if (query) url += `search=${query}`;
-      
-      const response = await axios.get(url);
+      setLoading(true);
+      const response = await axios.get(`${API_URL}/api/products`);
       setProducts(response.data);
-    } catch (error) {
-      setError('Error fetching products');
-    } finally {
+      setLoading(false);
+    } catch (err) {
+      setError('Error fetching products. Please try again later.');
       setLoading(false);
     }
   };
 
-  useEffect(() => {
-    fetchCategories();
-    fetchProducts();
-  }, []);
+  const fetchCategories = async () => {
+    try {
+      const response = await axios.get(`${API_URL}/api/categories`);
+      setCategories(response.data);
+    } catch (err) {
+      console.error('Error fetching categories:', err);
+    }
+  };
 
-  // Update subcategories when category is selected
-  useEffect(() => {
-    const selectedCat = categories.find(cat => cat.name === selectedCategory);
-    setSubcategories(selectedCat ? selectedCat.subcategories : []);
+  const fetchSubcategories = async (categoryId) => {
+    try {
+      const response = await axios.get(`${API_URL}/api/subcategories/${categoryId}`);
+      setSubcategories(response.data);
+    } catch (err) {
+      console.error('Error fetching subcategories:', err);
+    }
+  };
+
+  const fetchCart = async () => {
+    try {
+      const response = await axios.get(`${API_URL}/api/cart`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+      setCart(response.data);
+    } catch (err) {
+      console.error('Error fetching cart:', err);
+    }
+  };
+
+  const addToCart = async (product) => {
+    try {
+      const response = await axios.post(
+        `${API_URL}/api/cart/add`,
+        { productId: product._id, quantity: 1 },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`
+          }
+        }
+      );
+      setCart(response.data);
+      console.log(`Added ${product.name} to cart`);
+    } catch (err) {
+      console.error('Error adding to cart:', err);
+      // Display error message to user
+      setError('Failed to add product to cart. Please try again.');
+    }
+  };
+
+  const handleCategoryChange = (e) => {
+    setSelectedCategory(e.target.value);
     setSelectedSubcategory('');
-    fetchProducts(selectedCategory);
-  }, [selectedCategory]);
-
-  // Update products based on subcategory selection
-  useEffect(() => {
-    fetchProducts(selectedCategory, selectedSubcategory);
-  }, [selectedSubcategory]);
-
-  // Filter products based on search query
-  const handleSearch = (event) => {
-    const query = event.target.value;
-    setSearchQuery(query);
-    fetchProducts(selectedCategory, selectedSubcategory, query);
   };
 
-  // Wishlist toggle function
-  const toggleWishlist = (productId) => {
-    setWishlist((prevWishlist) =>
-      prevWishlist.includes(productId)
-        ? prevWishlist.filter((id) => id !== productId)
-        : [...prevWishlist, productId]
-    );
+  const handleSubcategoryChange = (e) => {
+    setSelectedSubcategory(e.target.value);
   };
 
-  // Handle category change
-  const handleCategoryChange = (event) => {
-    setSelectedCategory(event.target.value);
+  const handleSearchChange = (e) => {
+    setSearchTerm(e.target.value);
   };
 
-  // Handle subcategory change
-  const handleSubcategoryChange = (event) => {
-    setSelectedSubcategory(event.target.value);
+  const handleProductClick = (productId) => {
+    navigate(`/product/${productId}`);
   };
 
-  // Handle product click to view details
-  const handleProductClick = (product) => {
-    setSelectedProduct(product);
-  };
-
-  // Navigate back
-  const handleBackClick = () => {
-    navigate(-1);
-  };
+  const filteredProducts = products.filter(product => 
+    (selectedCategory === '' || product.category._id === selectedCategory) &&
+    (selectedSubcategory === '' || product.subcategory._id === selectedSubcategory) &&
+    product.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   return (
-    <div className="container mx-auto p-6">
-      <div className="flex justify-start mb-6">
-        <button
-          onClick={handleBackClick}
-          className="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600"
-        >
-          Back
-        </button>
-      </div>
+    <div className="flex flex-col min-h-screen bg-gray-100">
+      {/* Header Section */}
+      <header className='h-20 shadow-md bg-white fixed w-full z-30'>
+        <div className='container mx-auto flex items-center justify-between px-4 h-full'>
+          {/* Logo Section */}
+          <div className='flex items-center'>
+            <Link to="/">
+              <img src={logo} alt="Tailor's Touch Logo" className="h-12 mr-2" />
+            </Link>
+            <Link to="/" className='text-green-600 text-3xl font-bold hover:text-pink-500 transition-colors duration-300'>
+              Tailor's Touch Boutique
+            </Link>
+          </div>
+          
+          {/* Search Bar */}
+          <div className='hidden md:block w-1/3'>
+            <input
+              type="text"
+              placeholder="Search products..."
+              value={searchTerm}
+              onChange={handleSearchChange}
+              className="w-full py-2 px-3 border border-gray-300 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-pink-500"
+            />
+          </div>
 
-      <h1 className="text-4xl font-bold text-center mb-6">Browse Catalog</h1>
-
-      <div className="mb-6 flex justify-center space-x-4">
-        <select
-          value={selectedCategory}
-          onChange={handleCategoryChange}
-          className="p-2 border border-gray-300 rounded-lg"
-        >
-          <option value="">Select Category</option>
-          {categories.map((category) => (
-            <option key={category.name} value={category.name}>
-              {category.name}
-            </option>
-          ))}
-        </select>
-
-        {subcategories.length > 0 && (
-          <select
-            value={selectedSubcategory}
-            onChange={handleSubcategoryChange}
-            className="p-2 border border-gray-300 rounded-lg"
-          >
-            <option value="">Select Subcategory</option>
-            {subcategories.map((subcategory) => (
-              <option key={subcategory} value={subcategory}>
-                {subcategory}
-              </option>
-            ))}
-          </select>
-        )}
-      </div>
-
-      <input
-        type="text"
-        value={searchQuery}
-        onChange={handleSearch}
-        placeholder="Search products by name..."
-        className="block w-full p-2 border border-gray-300 rounded-lg mb-6"
-      />
-
-      {loading ? (
-        <div className="text-center">Loading products...</div>
-      ) : error ? (
-        <div className="text-red-500 text-center">{error}</div>
-      ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {products.length === 0 ? (
-            <p className="text-center col-span-full">No products available</p>
-          ) : (
-            products.map((product) => (
-              <div
-                key={product._id}
-                className="catalog-item bg-white shadow-lg p-4 rounded-lg relative flex flex-col items-center"
-                onClick={() => handleProductClick(product)}
-              >
-                <div className="absolute top-2 right-2 flex space-x-2">
-                  <FaHeart
-                    className={`cursor-pointer text-2xl ${
-                      wishlist.includes(product._id) ? 'text-red-600' : 'text-gray-500'
-                    } hover:text-red-600`}
-                    title="Add to Wishlist"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      toggleWishlist(product._id);
-                    }}
-                  />
-                  <FaShoppingCart
-                    className="text-blue-500 hover:text-blue-600 cursor-pointer text-2xl"
-                    title="Add to Cart"
-                  />
-                </div>
-
-                <img
-                  src={`http://localhost:8080/${product.image}`}
-                  alt={product.name}
-                  className="w-full h-40 object-cover mb-2"
-                />
-                <h2 className="text-xl font-semibold mb-2 text-center">{product.name}</h2>
-                <p className="text-lg text-gray-600 mb-2">Rs.{product.price}</p>
-                <p className="text-sm text-gray-600 mb-2">Category: {product.category}</p>
-                <p className="text-sm text-gray-600 mb-2">Stock: {product.stock}</p>
-                <p className="text-sm text-gray-600 mb-2">{product.description}</p>
-              </div>
-            ))
-          )}
+          {/* Navigation Links and Icons */}
+          <nav className="flex items-center space-x-6">
+            <Link to="/" className='text-gray-700 hover:text-pink-500 transition-colors duration-300'>Home</Link>
+            <Link to="/wishlist" className='text-gray-700 hover:text-pink-500 transition-colors duration-300 relative'>
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+              </svg>
+            </Link>
+            <Link to="/cart" className='text-gray-700 hover:text-pink-500 transition-colors duration-300 relative'>
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+              </svg>
+              {cart && cart.items && cart.items.length > 0 && (
+                <span className="absolute -top-2 -right-2 bg-pink-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs">
+                  {cart.items.reduce((total, item) => total + item.quantity, 0)}
+                </span>
+              )}
+            </Link>
+          </nav>
         </div>
-      )}
+      </header>
 
-      {selectedProduct && (
-        <div className="mt-8 p-6 border border-gray-300 rounded-lg bg-white">
-          <h2 className="text-3xl font-bold mb-4">Product Details</h2>
-          <div className="flex">
-            <div className="w-1/2 pr-4">
-              <img
-                src={`http://localhost:8080/${selectedProduct.image}`}
-                alt={selectedProduct.name}
-                className="w-full h-auto object-contain max-h-96"
-              />
-            </div>
-            <div className="w-1/2">
-              <h3 className="text-2xl font-semibold">{selectedProduct.name}</h3>
-              <p className="text-lg text-gray-600">Rs.{selectedProduct.price}</p>
-              <p className="text-lg text-gray-600">Category: {selectedProduct.category}</p>
-              <p className="text-lg text-gray-600">Stock: {selectedProduct.stock}</p>
-              <p className="text-lg text-gray-600">{selectedProduct.description}</p>
-
-              <div className="mt-6 space-x-4">
-                <button className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600">
-                  Add to Cart
-                </button>
-                <button className="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600">
-                  Add to Wishlist
-                </button>
-              </div>
-            </div>
+      {/* Main Content */}
+      <main className="flex-grow container mx-auto px-4 pt-24 pb-8"> 
+        {/* Mobile Search Bar */}
+        <div className="mb-4 md:hidden">
+          <input
+            type="text"
+            placeholder="Search products..."
+            value={searchTerm}
+            onChange={handleSearchChange}
+            className="w-full py-2 px-3 border border-gray-300 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-pink-500"
+          />
+        </div>
+        
+        <div className="mb-6 flex flex-wrap items-center">
+          <div className="w-full md:w-1/4 mb-4 md:mb-0">
+            <select
+              value={selectedCategory}
+              onChange={handleCategoryChange}
+              className="w-full py-2 px-3 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-pink-500"
+            >
+              <option value="">All Categories</option>
+              {categories.map(category => (
+                <option key={category._id} value={category._id}>{category.name}</option>
+              ))}
+            </select>
+          </div>
+          <div className="w-full md:w-1/4 md:pl-4">
+            <select
+              value={selectedSubcategory}
+              onChange={handleSubcategoryChange}
+              className="w-full py-2 px-3 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-pink-500"
+              disabled={!selectedCategory}
+            >
+              <option value="">All Subcategories</option>
+              {subcategories.map(subcategory => (
+                <option key={subcategory._id} value={subcategory._id}>{subcategory.name}</option>
+              ))}
+            </select>
           </div>
         </div>
-      )}
+
+        {loading && <div className="text-center mt-8">Loading...</div>}
+        {error && <div className="text-center mt-8 text-red-500">{error}</div>}
+
+        {!loading && !error && (
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+            {filteredProducts.map(product => (
+              <div 
+                key={product._id} 
+                className="bg-white rounded-lg overflow-hidden transition-shadow duration-300 hover:shadow-lg"
+              >
+                <div className="relative pb-[125%] overflow-hidden">
+                  <img 
+                    src={`${API_URL}/${product.image}`} 
+                    alt={product.name} 
+                    className="absolute top-0 left-0 w-full h-full object-cover object-center cursor-pointer"
+                    onClick={() => handleProductClick(product._id)}
+                  />
+                </div>
+                <div className="p-4">
+                  <h2 className="text-sm font-medium text-gray-900 mb-1 truncate">{product.name}</h2>
+                  <p className="text-xs text-gray-500 mb-2 truncate">{product.category.name}</p>
+                  <div className="flex justify-between items-center">
+                    <p className="text-sm font-bold text-gray-900">
+                      {formatPrice(product.batches[0]?.finalPrice)}
+                    </p>
+                    <button 
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        addToCart(product);
+                      }}
+                      className="px-3 py-1 bg-pink-500 text-white text-xs font-medium rounded hover:bg-pink-600 transition-colors duration-300"
+                    >
+                      Add to Cart
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {!loading && !error && filteredProducts.length === 0 && (
+          <p className="text-center mt-8 text-gray-500">No products found.</p>
+        )}
+      </main>
     </div>
   );
 };

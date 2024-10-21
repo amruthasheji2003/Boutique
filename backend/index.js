@@ -13,7 +13,7 @@ const categoryRoutes = require('./routes/categoryRoutes'); // Import category ro
 const authMiddleware = require('./middleware/authMiddleware');
 const subcategoryRoutes = require('./routes/subcategoryRoutes');
 const batchRoutes = require('./routes/batchRoutes');
-
+const cartRoutes = require('./routes/cartRoutes');
 
 // Initialize Express app
 const app = express();
@@ -45,7 +45,10 @@ app.use('/api/category', categoryRoutes); // Ensure categoryRoutes is valid
 app.use('/api/categories', categoryRoutes); // Ensure this matches your routing
 app.use('/api/subcategories', subcategoryRoutes);
 app.use('/api/subcategory', subcategoryRoutes);
-app.use('/api/batches', batchRoutes);
+app.use('/api', batchRoutes);
+app.use('/api/cart', cartRoutes);
+
+
 
 
 

@@ -45,7 +45,17 @@ const AdminPage = () => {
                   <span className="ml-4 font-semibold">Manage Products</span>
                 </Link>
                 {/* Nested Links for Categories and Subcategories */}
+                
                 <ul className="ml-8">
+                <li className="mb-4">
+                    <Link
+                      to="view-products"
+                      className="flex items-center text-pink-600 hover:bg-pink-100 p-3 rounded-lg transition-colors duration-300 w-full text-left"
+                    >
+                      <FaBoxes className="text-pink-500" />
+                      <span className="ml-4 font-semibold">View products</span>
+                    </Link>
+                  </li>
                   <li className="mb-4">
                     <Link
                       to="manage-categories"
@@ -55,6 +65,7 @@ const AdminPage = () => {
                       <span className="ml-4 font-semibold">Manage Categories</span>
                     </Link>
                   </li>
+             
                   <li className="mb-4">
                     <Link
                       to="manage-subcategories"

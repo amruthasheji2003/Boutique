@@ -139,7 +139,7 @@ const Login = () => {
           <p style={styles.notificationMessage}>{successMessage}</p>
         </div>
       )}
-
+background
       <main className='min-h-[calc(100vh-60px)] pt-0' style={{ ...styles.container, backgroundImage: `url(${backgroundImage})` }}>
         <div style={styles.formContainer}>
           <h2 style={styles.heading}>Login</h2>

@@ -18,10 +18,12 @@ import ForgotPassword from '../pages/ForgotPassword';
 import Profile from '../pages/Profile';
 import AdminPage from '../pages/AdminPage';
 import ManageUsers from '../pages/ManageUsers';
-import ManageProducts from '../pages/ManageProducts';
+import ManageProducts from '../pages/ManageProducts'; // Ensure the path is correct
 import MaterialManagement from '../pages/MaterialManagement';
 import ManageCategories from '../pages/ManageCategories';
 import ManageSubcategories from '../pages/ManageSubcategories';
+import ViewProducts from '../pages/ViewProducts';
+import ProductDetails from '../pages/ProductDetails';
 
 const router = createBrowserRouter([
     {
@@ -53,7 +55,9 @@ const router = createBrowserRouter([
                     { path: "manage-users", element: <ManageUsers /> }, // Nested route
                     { path: "manage-products", element: <ManageProducts /> },
                     { path: "manage-categories", element: <ManageCategories /> },
-                    { path: "manage-subcategories", element: <ManageSubcategories /> }, // Nested route
+                    { path: "manage-subcategories", element: <ManageSubcategories /> },
+                    { path: "view-products", element: <ViewProducts /> },
+                    { path: " products/${product._id}", element: <ProductDetails/>},
                 ]
             },
             // Other routes...

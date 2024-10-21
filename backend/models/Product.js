@@ -1,38 +1,72 @@
 const mongoose = require('mongoose');
 
-// Define the product schema
-const productSchema = new mongoose.Schema({
-  name: {
+// Define the schema for batches
+const batchSchema = new mongoose.Schema({
+  batchId: {
     type: String,
     required: true,
   },
-  category: {
-    type: String,
+  productionDate: {
+    type: Date,
     required: true,
   },
-  subcategory: {
+  grade: {
     type: String,
+    enum: ['A', 'B', 'C'],
     required: true,
   },
-  description: {
-    type: String,
+  actualPrice: {
+    type: Number,
     required: true,
   },
-  image: {
-    type: String, // Store the filename of the image
+  finalPrice: {
+    type: Number,
     required: true,
   },
   stock: {
-    type: Number, // Number of units available
+    type: Number,
     required: true,
-  },
-  batches: [{
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Batch', // Reference to the Batch model
-  }],
-});
+    min: 0
+  }
+}, { _id: false });
 
-// Check if the Product model already exists before defining it
-const Product = mongoose.models.Product || mongoose.model('Product', productSchema);
+// Define the main product schema
+const productSchema = new mongoose.Schema({
+  productId: { 
+    type: String, 
+    required: true, 
+    unique: true 
+  },
+  name: { 
+    type: String, 
+    required: true 
+  },
+  category: { 
+    type: mongoose.Schema.Types.ObjectId, 
+    ref: 'Category', 
+    required: true 
+  },
+  subcategory: { 
+    type: mongoose.Schema.Types.ObjectId, 
+    ref: 'Subcategory', 
+    required: true 
+  },
+  description: { 
+    type: String, 
+    required: true 
+  },
+  image: { 
+    type: String, 
+    required: true 
+  },
+  batches: [batchSchema], // Embed batches directly within the product
+  finalStock: {
+    type: Number,
+    default: 0
+  }
+}, { timestamps: true });
+
+// Create the Product model
+const Product = mongoose.model('Product', productSchema);
 
 module.exports = Product;

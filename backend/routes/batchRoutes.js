@@ -2,24 +2,10 @@ const express = require('express');
 const router = express.Router();
 const batchController = require('../controllers/batchController');
 
-// @route POST /api/batches
-// @desc Add a new batch
-router.post('/', batchController.addBatch);
-
-// @route GET /api/batches
-// @desc Get all batches
-router.get('/', batchController.getAllBatches);
-
-// @route GET /api/batches/:id
-// @desc Get batch by ID
-router.get('/:id', batchController.getBatchById);
-
-// @route PUT /api/batches/:id
-// @desc Update a batch by ID
-router.put('/:id', batchController.updateBatch);
-
-// @route DELETE /api/batches/:id
-// @desc Delete a batch by ID
-router.delete('/:id', batchController.deleteBatch);
+router.post('/batches', batchController.createBatch);
+router.get('/batches', batchController.getAllBatches);
+router.get('/batches/:id', batchController.getBatchById);
+router.put('/batches/:id', batchController.updateBatch);
+router.delete('/batches/:id', batchController.deleteBatch);
 
 module.exports = router;
