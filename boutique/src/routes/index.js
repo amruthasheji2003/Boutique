@@ -47,6 +47,7 @@ const router = createBrowserRouter([
             { path: "dress-style-selection", element: <DressStyleSelection /> },
             { path: "forgot-password", element: <ForgotPassword /> },
             { path: "manage-materials", element: <MaterialManagement /> },
+            { path: "manage-products/:id", element:<ManageProducts />},
             // Admin routes
             {
                 path: "admin",
@@ -58,6 +59,7 @@ const router = createBrowserRouter([
                     { path: "manage-subcategories", element: <ManageSubcategories /> },
                     { path: "view-products", element: <ViewProducts /> },
                     { path: " products/${product._id}", element: <ProductDetails/>},
+                    
                 ]
             },
             // Other routes...

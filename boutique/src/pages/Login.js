@@ -63,6 +63,7 @@ const Login = () => {
 
       if (userResponse.status === 200) {
         localStorage.setItem('token', userData.token);
+        localStorage.setItem('userId', userData.userId); 
         setSuccessMessage('User login successful! Redirecting...');
         setTimeout(() => {
           navigate('/Customer');

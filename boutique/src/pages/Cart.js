@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Link } from 'react-router-dom';
 
-const API_URL = 'http://localhost:8080';
+const API_BASE_URL = 'http://localhost:8080';
 
-const Cart = () => {
+function Cart() {
   const [cart, setCart] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -16,22 +15,24 @@ const Cart = () => {
   const fetchCart = async () => {
     try {
       setLoading(true);
-      const response = await axios.get(`${API_URL}/api/cart`, {
+      const response = await axios.get(`${API_BASE_URL}/api/cart`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`
         }
       });
+      console.log('Cart data received:', response.data);
       setCart(response.data);
       setLoading(false);
     } catch (err) {
+      console.error('Error fetching cart:', err);
       setError('Error fetching cart. Please try again.');
       setLoading(false);
     }
   };
 
-  const updateQuantity = async (productId, newQuantity) => {
+  const updateCartItem = async (productId, newQuantity) => {
     try {
-      const response = await axios.put(`${API_URL}/api/cart/update`, 
+      await axios.put(`${API_BASE_URL}/api/cart`, 
         { productId, quantity: newQuantity },
         {
           headers: {
@@ -39,82 +40,96 @@ const Cart = () => {
           }
         }
       );
-      setCart(response.data);
+      fetchCart();
     } catch (err) {
-      setError('Error updating cart. Please try again.');
+      console.error('Error updating cart item:', err);
+      setError('Error updating cart item. Please try again.');
     }
   };
 
-  const removeItem = async (productId) => {
+  const removeFromCart = async (productId) => {
     try {
-      const response = await axios.delete(`${API_URL}/api/cart/remove/${productId}`, {
+      await axios.delete(`${API_BASE_URL}/api/cart/${productId}`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`
         }
       });
-      setCart(response.data);
+      fetchCart();
     } catch (err) {
+      console.error('Error removing item from cart:', err);
       setError('Error removing item from cart. Please try again.');
     }
   };
 
-  if (loading) return <div className="text-center py-10">Loading cart...</div>;
-  if (error) return <div className="text-center py-10 text-red-500">{error}</div>;
-  if (!cart || cart.items.length === 0) return <div className="text-center py-10">Your cart is empty.</div>;
+  const clearCart = async () => {
+    try {
+      await axios.delete(`${API_BASE_URL}/api/cart`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+      fetchCart();
+    } catch (err) {
+      console.error('Error clearing cart:', err);
+      setError('Error clearing cart. Please try again.');
+    }
+  };
+
+  if (loading) return <div className="container mx-auto p-4">Loading...</div>;
+  if (error) return <div className="container mx-auto p-4 text-red-500">{error}</div>;
+  if (!cart || !cart.items || cart.items.length === 0) return <div className="container mx-auto p-4">Your cart is empty.</div>;
 
   return (
-    <div className="container mx-auto mt-10 px-4">
-      <h1 className="text-2xl font-bold mb-5">Your Cart</h1>
-      <div className="bg-white shadow-md rounded-lg overflow-hidden">
-        {cart.items.map(item => (
-          <div key={item.product._id} className="flex items-center border-b border-gray-200 py-4 px-6">
+    <div className="container mx-auto p-4">
+      <h1 className="text-2xl font-bold mb-4 text-center">Your Cart</h1>
+      <div className="space-y-4">
+        {cart.items.map((item) => (
+          <div key={item._id} className="flex items-center border-b border-gray-200 py-4">
             <img 
-              src={`${API_URL}/${item.product.image}`} 
-              alt={item.product.name} 
-              className="w-20 h-20 object-cover mr-4 rounded"
+              src={`${API_BASE_URL}/${item.product.image}`} 
+              alt={item.product.name}
+              className="w-24 h-24 object-cover mr-4"
             />
             <div className="flex-grow">
-              <h2 className="text-lg font-semibold">{item.product.name}</h2>
-              <p className="text-gray-600">Price: ₹{item.price.toFixed(2)}</p>
+              <h3 className="text-lg font-semibold">{item.product.name}</h3>
+              <p className="text-gray-600">Price: ${item.price.toFixed(2)}</p>
               <div className="flex items-center mt-2">
                 <button 
-                  onClick={() => updateQuantity(item.product._id, Math.max(1, item.quantity - 1))} 
-                  className="bg-gray-200 px-2 py-1 rounded"
+                  onClick={() => updateCartItem(item.product._id, item.quantity - 1)} 
+                  disabled={item.quantity <= 1}
+                  className="bg-gray-200 px-2 py-1 rounded-l disabled:opacity-50"
                 >
                   -
                 </button>
-                <span className="mx-2">{item.quantity}</span>
+                <span className="px-4 py-1 bg-gray-100">{item.quantity}</span>
                 <button 
-                  onClick={() => updateQuantity(item.product._id, item.quantity + 1)} 
-                  className="bg-gray-200 px-2 py-1 rounded"
+                  onClick={() => updateCartItem(item.product._id, item.quantity + 1)}
+                  className="bg-gray-200 px-2 py-1 rounded-r"
                 >
                   +
                 </button>
-                <button 
-                  onClick={() => removeItem(item.product._id)} 
-                  className="ml-4 text-red-500 hover:text-red-700"
-                >
-                  Remove
-                </button>
               </div>
             </div>
-            <div className="text-right">
-              <p className="font-semibold">₹{(item.price * item.quantity).toFixed(2)}</p>
-            </div>
+            <button 
+              onClick={() => removeFromCart(item.product._id)}
+              className="ml-4 bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
+            >
+              Remove
+            </button>
           </div>
         ))}
       </div>
-      <div className="mt-8 text-right">
-        <p className="text-xl font-bold">Total: ₹{cart.total.toFixed(2)}</p>
-        <Link 
-          to="/checkout" 
-          className="mt-4 inline-block bg-pink-500 text-white px-6 py-2 rounded hover:bg-pink-600 transition-colors duration-300"
-        >
-          Proceed to Checkout
-        </Link>
+      <div className="mt-6 text-right text-xl font-bold">
+        Total: ${cart.items.reduce((total, item) => total + item.price * item.quantity, 0).toFixed(2)}
       </div>
+      <button 
+        onClick={clearCart}
+        className="mt-4 bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
+      >
+        Clear Cart
+      </button>
     </div>
   );
-};
+}
 
 export default Cart;

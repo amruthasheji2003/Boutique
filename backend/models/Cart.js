@@ -23,11 +23,7 @@ const CartSchema = new mongoose.Schema({
     ref: 'User',
     required: true
   },
-  items: [CartItemSchema],
-  total: {
-    type: Number,
-    default: 0
-  }
+  items: [CartItemSchema]
 }, { timestamps: true });
 
 module.exports = mongoose.model('Cart', CartSchema);

@@ -13,6 +13,8 @@ const ViewProducts = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [productsPerPage] = useState(10);
   const navigate = useNavigate();
+  const [editingProduct, setEditingProduct] = useState(null);
+
 
   useEffect(() => {
     fetchProducts();
@@ -31,7 +33,31 @@ const ViewProducts = () => {
   };
 
   const handleEdit = (productId) => {
-    navigate(`/manage-products/${productId}`);
+    const productToEdit = products.find(p => p._id === productId);
+    setEditingProduct({ ...productToEdit });
+  };
+
+  const handleEditChange = (e) => {
+    const { name, value } = e.target;
+    setEditingProduct(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const handleEditSave = async () => {
+    try {
+      await axios.put(`${API_URL}/api/products/${editingProduct._id}`, editingProduct);
+      setProducts(products.map(p => p._id === editingProduct._id ? editingProduct : p));
+      setEditingProduct(null);
+    } catch (err) {
+      console.error('Error updating product:', err);
+      alert('Failed to update product. Please try again.');
+    }
+  };
+
+  const handleEditCancel = () => {
+    setEditingProduct(null);
   };
 
   const handleDeleteConfirmation = (productId) => {
