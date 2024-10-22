@@ -32,43 +32,43 @@ function Cart() {
 
   const updateCartItem = async (productId, newQuantity) => {
     try {
-      await axios.put(`${API_BASE_URL}/api/cart`, 
+      const response = await axios.put(
+        `${API_BASE_URL}/api/cart`,
         { productId, quantity: newQuantity },
         {
           headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`
+            'Authorization': `Bearer ${localStorage.getItem('token')}`,
+            'Content-Type': 'application/json'
           }
         }
       );
-      fetchCart();
+      setCart(response.data.cart);
     } catch (err) {
       console.error('Error updating cart item:', err);
       setError('Error updating cart item. Please try again.');
     }
   };
-
   const removeFromCart = async (productId) => {
     try {
-      await axios.delete(`${API_BASE_URL}/api/cart/${productId}`, {
+      const response = await axios.delete(`${API_BASE_URL}/api/cart/remove/${productId}`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`
         }
       });
-      fetchCart();
+      setCart(response.data.cart);
     } catch (err) {
       console.error('Error removing item from cart:', err);
       setError('Error removing item from cart. Please try again.');
     }
   };
-
   const clearCart = async () => {
     try {
-      await axios.delete(`${API_BASE_URL}/api/cart`, {
+      const response = await axios.delete(`${API_BASE_URL}/api/cart/clear`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`
         }
       });
-      fetchCart();
+      setCart(response.data.cart);
     } catch (err) {
       console.error('Error clearing cart:', err);
       setError('Error clearing cart. Please try again.');
@@ -92,7 +92,7 @@ function Cart() {
             />
             <div className="flex-grow">
               <h3 className="text-lg font-semibold">{item.product.name}</h3>
-              <p className="text-gray-600">Price: ${item.price.toFixed(2)}</p>
+              <p className="text-gray-600">Price: Rs.{item.price.toFixed(2)}</p>
               <div className="flex items-center mt-2">
                 <button 
                   onClick={() => updateCartItem(item.product._id, item.quantity - 1)} 
@@ -120,7 +120,7 @@ function Cart() {
         ))}
       </div>
       <div className="mt-6 text-right text-xl font-bold">
-        Total: ${cart.items.reduce((total, item) => total + item.price * item.quantity, 0).toFixed(2)}
+        Total: Rs.{cart.items.reduce((total, item) => total + item.price * item.quantity, 0).toFixed(2)}
       </div>
       <button 
         onClick={clearCart}

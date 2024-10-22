@@ -24,6 +24,7 @@ const BrowseCatalog = () => {
   const [wishlist, setWishlist] = useState([]);
   const [cart, setCart] = useState([]);
   const [cartMessage, setCartMessage] = useState('');
+  const [selectedGrade, setSelectedGrade] = useState('');
 
   const navigate = useNavigate();
 
@@ -87,6 +88,20 @@ const BrowseCatalog = () => {
       console.error('Error fetching cart:', err);
     }
   };
+  const getProductPriceRange = (product) => {
+    if (!product.batches || product.batches.length === 0) {
+      return 'Price not available';
+    }
+
+    const prices = product.batches.map(batch => batch.finalPrice);
+    const minPrice = Math.min(...prices);
+    const maxPrice = Math.max(...prices);
+    if (minPrice === maxPrice) {
+      return formatPrice(minPrice);
+    } else {
+      return `${formatPrice(minPrice)} - ${formatPrice(maxPrice)}`;
+    }
+  };
   const handleAddToCart = async (product) => {
     try {
       const token = localStorage.getItem('token');
@@ -142,6 +157,9 @@ const BrowseCatalog = () => {
   const handleSearchChange = (e) => {
     setSearchTerm(e.target.value);
   };
+  const handleGradeChange = (e) => {
+    setSelectedGrade(e.target.value);
+  };
 
   const addToWishlist = (product) => {
     if (!wishlist.some(item => item._id === product._id)) {
@@ -153,8 +171,10 @@ const BrowseCatalog = () => {
   const filteredProducts = products.filter(product => 
     (selectedCategory === '' || product.category._id === selectedCategory) &&
     (selectedSubcategory === '' || product.subcategory._id === selectedSubcategory) &&
+    (selectedGrade === '' || product.batches.some(batch => batch.grade === selectedGrade)) &&
     product.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
+  const allGrades = [...new Set(products.flatMap(product => product.batches.map(batch => batch.grade)))];
 
   const handleProductClick = (productId) => {
     navigate(`/product/${productId}`);
@@ -164,9 +184,21 @@ const BrowseCatalog = () => {
     <div className="flex flex-col min-h-screen bg-gray-100">
       <header className='h-16 shadow-md bg-white fixed w-full z-30'>
         <div className='container mx-auto flex items-center justify-between px-4 h-full'>
-          <Link to="/" className='text-green-600 text-3xl font-bold hover:text-pink-500 transition-colors duration-300'>
-            Tailor's Touch Boutique
-          </Link>
+        <Link to="/">
+              <img src={logo} alt="Tailor's Touch Logo" className="h-12 mr-2" />
+            </Link>
+            <Link to="/" className='text-green-600 text-3xl font-bold hover:text-pink-500 transition-colors duration-300'>
+              Tailor's Touch Boutique
+            </Link>
+            <div className="flex-grow mx-4">
+            <input
+              type="text"
+              placeholder="Search products..."
+              value={searchTerm}
+              onChange={handleSearchChange}
+              className="w-full py-2 px-3 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-pink-500"
+            />
+          </div>
           <nav className="flex items-center space-x-6">
             <Link to="/" className='text-gray-700 hover:text-pink-500 transition-colors duration-300'>Home</Link>
             <Link to="/wishlist" className='text-gray-700 hover:text-pink-500 transition-colors duration-300 relative'>
@@ -216,15 +248,6 @@ const BrowseCatalog = () => {
               ))}
             </select>
           </div>
-          <div className="w-full md:w-1/2 md:pl-4">
-            <input
-              type="text"
-              placeholder="Search products..."
-              value={searchTerm}
-              onChange={handleSearchChange}
-              className="w-full py-2 px-3 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-pink-500"
-            />
-          </div>
         </div>
 
         {loading && <div className="text-center mt-8">Loading...</div>}
@@ -236,62 +259,66 @@ const BrowseCatalog = () => {
           </div>
         )}
 
-        {!loading && !error && (
+{!loading && !error && (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-            {filteredProducts.map(product => (
-              <div 
-                key={product._id} 
-                className="bg-white rounded-lg overflow-hidden transition-shadow duration-300 hover:shadow-lg"
-              >
-                <div className="relative pb-[125%] overflow-hidden">
-                  <img 
-                    src={`${API_URL}/${product.image}`} 
-                    alt={product.name} 
-                    className="absolute top-0 left-0 w-full h-full object-cover object-center cursor-pointer"
-                    onClick={() => handleProductClick(product._id)}
-                  />
-                  <button 
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      addToWishlist(product);
-                    }}
-                    className="absolute top-2 right-2 p-2 bg-white rounded-full shadow-md text-gray-600 hover:text-pink-500 transition-colors duration-300"
-                    title="Add to Wishlist"
-                  >
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                    </svg>
-                  </button>
-                </div>
-                <div className="p-4">
-                  <h2 className="text-sm font-medium text-gray-900 mb-1 truncate">{product.name}</h2>
-                  <p className="text-xs text-gray-500 mb-2 truncate">{product.category.name}</p>
-                  <div className="flex justify-between items-center">
-                    <p className="text-sm font-bold text-gray-900">
-                      {formatPrice(product.batches[0]?.finalPrice)}
-                    </p>
+            {filteredProducts.map(product => {
+              const priceRange = getProductPriceRange(product);
+              return (
+                <div 
+                  key={product._id} 
+                  className="bg-white rounded-lg overflow-hidden transition-shadow duration-300 hover:shadow-lg"
+                >
+                  <div className="relative pb-[125%] overflow-hidden">
+                    <img 
+                      src={`${API_URL}/${product.image}`} 
+                      alt={product.name} 
+                      className="absolute top-0 left-0 w-full h-full object-cover object-center cursor-pointer"
+                      onClick={() => handleProductClick(product._id)}
+                    />
                     <button 
                       onClick={(e) => {
                         e.stopPropagation();
-                        handleAddToCart(product); // Use 
+                        addToWishlist(product);
                       }}
-                      className="px-3 py-1 bg-pink-500 text-white text-xs font-medium rounded hover:bg-pink-600 transition-colors duration-300"
+                      className="absolute top-2 right-2 p-2 bg-white rounded-full shadow-md text-gray-600 hover:text-pink-500 transition-colors duration-300"
+                      title="Add to Wishlist"
                     >
-                      Add to Cart
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                      </svg>
                     </button>
                   </div>
+                  <div className="p-4">
+                    <h2 className="text-sm font-medium text-gray-900 mb-1 truncate">{product.name}</h2>
+                    <p className="text-xs text-gray-500 mb-2 truncate">{product.category.name}</p>
+                    <div className="flex justify-between items-center">
+                      <p className="text-sm font-bold text-gray-900">
+                        {priceRange}
+                      </p>
+                      <button 
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleAddToCart(product);
+                        }}
+                        className="px-3 py-1 bg-pink-500 text-white text-xs font-medium rounded hover:bg-pink-600 transition-colors duration-300"
+                      >
+                        Add to Cart
+                      </button>
+                    </div>
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
 
-        {!loading && !error && filteredProducts.length === 0 && (
+        
+
+{!loading && !error && filteredProducts.length === 0 && (
           <p className="text-center mt-8 text-gray-500">No products found.</p>
         )}
       </main>
     </div>
   );
 };
-
 export default BrowseCatalog;

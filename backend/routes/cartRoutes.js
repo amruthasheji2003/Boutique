@@ -13,12 +13,10 @@ router.get('/', cartController.getCart);
 router.post('/add', cartController.addToCart);
 
 // Update the quantity of an item in the cart
-router.put('/update', cartController.updateCartItem);
+router.put('/', cartController.updateCartItem);  
 
 // Remove an item from the cart
 router.delete('/remove/:productId', cartController.removeFromCart);
-
 // Clear the entire cart
 router.delete('/clear', cartController.clearCart);
-
 module.exports = router;
