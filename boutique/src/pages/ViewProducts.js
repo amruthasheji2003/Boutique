@@ -77,9 +77,8 @@ const ViewProducts = () => {
         <h1 className="text-2xl font-bold">View Products</h1>
         <Link 
           to="/manage-products"
-          className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
+          
         >
-          Add New Product
         </Link>
       </div>
       <div className="mb-4">

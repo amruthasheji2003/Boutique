@@ -56,8 +56,13 @@ const ManageUsers = () => {
     const indexOfFirstUser = indexOfLastUser - usersPerPage;
     const currentUsers = filteredUsers.slice(indexOfFirstUser, indexOfLastUser);
 
+    const pageNumbers = [];
+    for (let i = 1; i <= Math.ceil(filteredUsers.length / usersPerPage); i++) {
+        pageNumbers.push(i);
+    }
+
     const nextPage = () => {
-        if (indexOfLastUser < filteredUsers.length) {
+        if (currentPage < pageNumbers.length) {
             setCurrentPage(prevPage => prevPage + 1);
         }
     };
@@ -67,6 +72,8 @@ const ManageUsers = () => {
             setCurrentPage(prevPage => prevPage - 1);
         }
     };
+
+    const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
     if (loading) return <div className="text-center mt-10">Loading...</div>;
     if (error) return <div className="text-red-500 text-center mt-10">{error}</div>;
@@ -116,21 +123,39 @@ const ManageUsers = () => {
                 </table>
             </div>
 
-            <div className="flex justify-between mt-6">
-                <button 
-                    onClick={prevPage}
-                    className={`px-6 py-2 rounded-lg text-gray-700 bg-gray-100 hover:bg-gray-200 transition-all ${currentPage === 1 ? 'opacity-50 cursor-not-allowed' : ''}`}
-                    disabled={currentPage === 1}
-                >
-                    Previous
-                </button>
-                <button 
-                    onClick={nextPage}
-                    className={`px-6 py-2 rounded-lg bg-blue-500 text-white hover:bg-blue-600 transition-all ${indexOfLastUser >= filteredUsers.length ? 'opacity-50 cursor-not-allowed' : ''}`}
-                    disabled={indexOfLastUser >= filteredUsers.length}
-                >
-                    Next
-                </button>
+            {/* Pagination */}
+            <div className="flex justify-center mt-6">
+                <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+                    <button
+                        onClick={prevPage}
+                        className={`relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 ${currentPage === 1 ? 'opacity-50 cursor-not-allowed' : ''}`}
+                        disabled={currentPage === 1}
+                    >
+                        <span className="sr-only">Previous</span>
+                        <svg className="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                            <path fillRule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clipRule="evenodd" />
+                        </svg>
+                    </button>
+                    {pageNumbers.map(number => (
+                        <button
+                            key={number}
+                            onClick={() => paginate(number)}
+                            className={`relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium ${currentPage === number ? 'z-10 bg-indigo-50 border-indigo-500 text-indigo-600' : 'text-gray-500 hover:bg-gray-50'}`}
+                        >
+                            {number}
+                        </button>
+                    ))}
+                    <button
+                        onClick={nextPage}
+                        className={`relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 ${currentPage === pageNumbers.length ? 'opacity-50 cursor-not-allowed' : ''}`}
+                        disabled={currentPage === pageNumbers.length}
+                    >
+                        <span className="sr-only">Next</span>
+                        <svg className="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                            <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
+                        </svg>
+                    </button>
+                </nav>
             </div>
         </div>
     );
