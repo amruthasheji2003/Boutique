@@ -25,6 +25,7 @@ import ManageSubcategories from '../pages/ManageSubcategories';
 import ViewProducts from '../pages/ViewProducts';
 import EditProduct from '../pages/EditProduct';
 import ProductDetails from '../pages/ProductDetails';
+import AboutUs from '../pages/AboutUs';
 
 const router = createBrowserRouter([
     {
@@ -49,6 +50,7 @@ const router = createBrowserRouter([
             { path: "forgot-password", element: <ForgotPassword /> },
             { path: "manage-materials", element: <MaterialManagement /> },
             { path: "manage-products/:id", element:<ManageProducts />},
+            { path: "about-us", element:<AboutUs />},
             // Admin routes
             {
                 path: "admin",
