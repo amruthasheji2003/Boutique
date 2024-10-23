@@ -13,8 +13,6 @@ const ViewProducts = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [productsPerPage] = useState(10);
   const navigate = useNavigate();
-  const [editingProduct, setEditingProduct] = useState(null);
-
 
   useEffect(() => {
     fetchProducts();
@@ -30,34 +28,6 @@ const ViewProducts = () => {
       setError('Error fetching products. Please try again later.');
       setLoading(false);
     }
-  };
-
-  const handleEdit = (productId) => {
-    const productToEdit = products.find(p => p._id === productId);
-    setEditingProduct({ ...productToEdit });
-  };
-
-  const handleEditChange = (e) => {
-    const { name, value } = e.target;
-    setEditingProduct(prev => ({
-      ...prev,
-      [name]: value
-    }));
-  };
-
-  const handleEditSave = async () => {
-    try {
-      await axios.put(`${API_URL}/api/products/${editingProduct._id}`, editingProduct);
-      setProducts(products.map(p => p._id === editingProduct._id ? editingProduct : p));
-      setEditingProduct(null);
-    } catch (err) {
-      console.error('Error updating product:', err);
-      alert('Failed to update product. Please try again.');
-    }
-  };
-
-  const handleEditCancel = () => {
-    setEditingProduct(null);
   };
 
   const handleDeleteConfirmation = (productId) => {
@@ -82,6 +52,10 @@ const ViewProducts = () => {
     setCurrentPage(1);
   };
 
+  const handleEdit = (productId) => {
+    navigate(`/admin/edit-product/${productId}`);
+  };
+
   const filteredProducts = products.filter(product =>
     product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     product.productId.toLowerCase().includes(searchTerm.toLowerCase())
@@ -99,7 +73,15 @@ const ViewProducts = () => {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <h1 className="text-2xl font-bold mb-6">View Products</h1>
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-2xl font-bold">View Products</h1>
+        <Link 
+          to="/manage-products"
+          className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
+        >
+          Add New Product
+        </Link>
+      </div>
       <div className="mb-4">
         <input
           type="text"

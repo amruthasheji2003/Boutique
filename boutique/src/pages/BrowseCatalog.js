@@ -23,8 +23,7 @@ const BrowseCatalog = () => {
   const [error, setError] = useState(null);
   const [wishlist, setWishlist] = useState([]);
   const [cart, setCart] = useState([]);
-  const [cartMessage, setCartMessage] = useState('');
-  const [selectedGrade, setSelectedGrade] = useState('');
+  const [cartMessage, setCartMessage] = useState(null);
 
   const navigate = useNavigate();
 
@@ -88,6 +87,7 @@ const BrowseCatalog = () => {
       console.error('Error fetching cart:', err);
     }
   };
+
   const getProductPriceRange = (product) => {
     if (!product.batches || product.batches.length === 0) {
       return 'Price not available';
@@ -102,16 +102,15 @@ const BrowseCatalog = () => {
       return `${formatPrice(minPrice)} - ${formatPrice(maxPrice)}`;
     }
   };
+
   const handleAddToCart = async (product) => {
     try {
       const token = localStorage.getItem('token');
       if (!token) {
-        setCartMessage('Please log in to add items to cart.');
+        setCartMessage({ text: 'Please log in to add items to cart.', type: 'error' });
         return;
       }
-  
-      console.log('Adding product to cart:', product);
-  
+
       const response = await axios.post(`${API_URL}/api/cart/add`, {
         productId: product.productId,
         quantity: 1
@@ -120,28 +119,19 @@ const BrowseCatalog = () => {
           Authorization: `Bearer ${token}`
         }
       });
-  
-      console.log('Full server response:', response);
-      console.log('Response data:', response.data);
-      console.log('Response status:', response.status);
-  
+
       if (response.data && response.data.cart) {
         setCart(response.data.cart);
-        setCartMessage(`${product.name} added to cart successfully!`);
-        console.log(`Added ${product.name} to cart`);
+        setCartMessage({ text: `${product.name} added to cart successfully!`, type: 'success' });
       } else {
-        console.error('Unexpected response structure:', response.data);
         throw new Error('Invalid response from server');
       }
     } catch (err) {
       console.error('Error adding to cart:', err);
-      console.error('Error response:', err.response);
-      console.error('Error message:', err.message);
-      console.error('Error stack:', err.stack);
-      setCartMessage(err.response?.data?.message || err.message || 'Failed to add item to cart. Please try again.');
+      setCartMessage({ text: err.response?.data?.message || err.message || 'Failed to add item to cart. Please try again.', type: 'error' });
     }
     setTimeout(() => {
-      setCartMessage('');
+      setCartMessage(null);
     }, 3000);
   };
 
@@ -157,9 +147,6 @@ const BrowseCatalog = () => {
   const handleSearchChange = (e) => {
     setSearchTerm(e.target.value);
   };
-  const handleGradeChange = (e) => {
-    setSelectedGrade(e.target.value);
-  };
 
   const addToWishlist = (product) => {
     if (!wishlist.some(item => item._id === product._id)) {
@@ -171,26 +158,24 @@ const BrowseCatalog = () => {
   const filteredProducts = products.filter(product => 
     (selectedCategory === '' || product.category._id === selectedCategory) &&
     (selectedSubcategory === '' || product.subcategory._id === selectedSubcategory) &&
-    (selectedGrade === '' || product.batches.some(batch => batch.grade === selectedGrade)) &&
     product.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
-  const allGrades = [...new Set(products.flatMap(product => product.batches.map(batch => batch.grade)))];
-
+  
   const handleProductClick = (productId) => {
     navigate(`/product/${productId}`);
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-gray-100">
+    <div className="flex flex-col min-h-screen bg-gray-100 relative">
       <header className='h-16 shadow-md bg-white fixed w-full z-30'>
         <div className='container mx-auto flex items-center justify-between px-4 h-full'>
-        <Link to="/">
-              <img src={logo} alt="Tailor's Touch Logo" className="h-12 mr-2" />
-            </Link>
-            <Link to="/" className='text-green-600 text-3xl font-bold hover:text-pink-500 transition-colors duration-300'>
-              Tailor's Touch Boutique
-            </Link>
-            <div className="flex-grow mx-4">
+          <Link to="/">
+            <img src={logo} alt="Tailor's Touch Logo" className="h-12 mr-2" />
+          </Link>
+          <Link to="/" className='text-green-600 text-3xl font-bold hover:text-pink-500 transition-colors duration-300'>
+            Tailor's Touch Boutique
+          </Link>
+          <div className="flex-grow mx-4">
             <input
               type="text"
               placeholder="Search products..."
@@ -249,17 +234,11 @@ const BrowseCatalog = () => {
             </select>
           </div>
         </div>
-
+        
         {loading && <div className="text-center mt-8">Loading...</div>}
         {error && <div className="text-center mt-8 text-red-500">{error}</div>}
-        
-        {cartMessage && (
-          <div className="text-center mt-4 text-green-500">
-            {cartMessage}
-          </div>
-        )}
 
-{!loading && !error && (
+        {!loading && !error && (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
             {filteredProducts.map(product => {
               const priceRange = getProductPriceRange(product);
@@ -312,13 +291,22 @@ const BrowseCatalog = () => {
           </div>
         )}
 
-        
-
-{!loading && !error && filteredProducts.length === 0 && (
+        {!loading && !error && filteredProducts.length === 0 && (
           <p className="text-center mt-8 text-gray-500">No products found.</p>
         )}
       </main>
+
+      {cartMessage && (
+        <div 
+          className={`fixed bottom-4 right-4 p-4 rounded-md shadow-lg ${
+            cartMessage.type === 'success' ? 'bg-green-500' : 'bg-red-500'
+          } text-white z-50 transition-opacity duration-300`}
+        >
+          {cartMessage.text}
+        </div>
+      )}
     </div>
   );
 };
+
 export default BrowseCatalog;

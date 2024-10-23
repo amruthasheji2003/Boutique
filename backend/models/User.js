@@ -31,10 +31,7 @@ const userSchema = new mongoose.Schema({
     trim: true,
     match: phoneRegex, // Validate phone number format
   },
-  profileImage: {
-    type: String,
-    default: 'default_profile_image.jpg', // Default profile image
-  },
+  // Default profile image field can be added here if needed
   role: {
     type: String,
     enum: ['customer', 'admin'], // Define roles if needed
@@ -59,4 +56,3 @@ userSchema.methods.comparePassword = async function (password) {
 };
 
 module.exports = mongoose.model('User', userSchema);
-

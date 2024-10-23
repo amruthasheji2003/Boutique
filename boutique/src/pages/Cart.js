@@ -7,7 +7,7 @@ function Cart() {
   const [cart, setCart] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
+  const [ cartMessage, setCartMessage] = useState(null);
   useEffect(() => {
     fetchCart();
   }, []);
@@ -48,6 +48,7 @@ function Cart() {
       setError('Error updating cart item. Please try again.');
     }
   };
+
   const removeFromCart = async (productId) => {
     try {
       const response = await axios.delete(`${API_BASE_URL}/api/cart/remove/${productId}`, {
@@ -55,12 +56,19 @@ function Cart() {
           Authorization: `Bearer ${localStorage.getItem('token')}`
         }
       });
-      setCart(response.data.cart);
+      
+      if (response.data && response.data.cart) {
+        setCart(response.data.cart);
+        setCartMessage({ text: 'Item removed from cart successfully!', type: 'success' });
+      } else {
+        throw new Error('Invalid response from server');
+      }
     } catch (err) {
       console.error('Error removing item from cart:', err);
-      setError('Error removing item from cart. Please try again.');
+      setCartMessage({ text: err.response?.data?.message || err.message || 'Failed to remove item from cart. Please try again.', type: 'error' });
     }
   };
+
   const clearCart = async () => {
     try {
       const response = await axios.delete(`${API_BASE_URL}/api/cart/clear`, {
@@ -85,33 +93,45 @@ function Cart() {
       <div className="space-y-4">
         {cart.items.map((item) => (
           <div key={item._id} className="flex items-center border-b border-gray-200 py-4">
-            <img 
-              src={`${API_BASE_URL}/${item.product.image}`} 
-              alt={item.product.name}
-              className="w-24 h-24 object-cover mr-4"
-            />
-            <div className="flex-grow">
-              <h3 className="text-lg font-semibold">{item.product.name}</h3>
-              <p className="text-gray-600">Price: Rs.{item.price.toFixed(2)}</p>
-              <div className="flex items-center mt-2">
-                <button 
-                  onClick={() => updateCartItem(item.product._id, item.quantity - 1)} 
-                  disabled={item.quantity <= 1}
-                  className="bg-gray-200 px-2 py-1 rounded-l disabled:opacity-50"
-                >
-                  -
-                </button>
-                <span className="px-4 py-1 bg-gray-100">{item.quantity}</span>
-                <button 
-                  onClick={() => updateCartItem(item.product._id, item.quantity + 1)}
-                  className="bg-gray-200 px-2 py-1 rounded-r"
-                >
-                  +
-                </button>
+            {item.product ? (
+              <>
+                <img 
+                  src={item.product.image ? `${API_BASE_URL}/${item.product.image}` : '/placeholder-image.jpg'}
+                  alt={item.product.name || 'Product image'}
+                  className="w-24 h-24 object-cover mr-4"
+                  onError={(e) => {
+                    e.target.onerror = null;
+                    e.target.src = '/placeholder-image.jpg';
+                  }}
+                />
+                <div className="flex-grow">
+                  <h3 className="text-lg font-semibold">{item.product.name}</h3>
+                  <p className="text-gray-600">Price: Rs.{item.price.toFixed(2)}</p>
+                  <div className="flex items-center mt-2">
+                    <button 
+                      onClick={() => updateCartItem(item.product._id, item.quantity - 1)} 
+                      disabled={item.quantity <= 1}
+                      className="bg-gray-200 px-2 py-1 rounded-l disabled:opacity-50"
+                    >
+                      -
+                    </button>
+                    <span className="px-4 py-1 bg-gray-100">{item.quantity}</span>
+                    <button 
+                      onClick={() => updateCartItem(item.product._id, item.quantity + 1)}
+                      className="bg-gray-200 px-2 py-1 rounded-r"
+                    >
+                      +
+                    </button>
+                  </div>
+                </div>
+              </>
+            ) : (
+              <div className="flex-grow">
+                <p className="text-red-500">Product information unavailable</p>
               </div>
-            </div>
+            )}
             <button 
-              onClick={() => removeFromCart(item.product._id)}
+              onClick={() => removeFromCart(item.product?._id)}
               className="ml-4 bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
             >
               Remove

@@ -23,6 +23,7 @@ import MaterialManagement from '../pages/MaterialManagement';
 import ManageCategories from '../pages/ManageCategories';
 import ManageSubcategories from '../pages/ManageSubcategories';
 import ViewProducts from '../pages/ViewProducts';
+import EditProduct from '../pages/EditProduct';
 import ProductDetails from '../pages/ProductDetails';
 
 const router = createBrowserRouter([
@@ -58,10 +59,12 @@ const router = createBrowserRouter([
                     { path: "manage-categories", element: <ManageCategories /> },
                     { path: "manage-subcategories", element: <ManageSubcategories /> },
                     { path: "view-products", element: <ViewProducts /> },
-                    { path: " products/${product._id}", element: <ProductDetails/>},
+                    { path: " manage-products/${id}", element: <ManageProducts/>},
+                    { path: "edit-product/:id", element: <EditProduct /> }
                     
                 ]
             },
+            { path: "product/:id", element: <ProductDetails /> }
             // Other routes...
         ]
     }

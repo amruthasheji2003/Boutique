@@ -5,12 +5,14 @@ const {
   addProduct,
   updateProduct,
   deleteProduct,
+  getProductById,
 } = require('../controllers/productController');
 
 const router = express.Router();
 
 // Define routes
 router.get('/', getProducts); // Fetch all products
+router.get('/:id', getProductById);
 router.post('/', upload.single('image'), addProduct); // Handle image upload for adding a product
 router.put('/:id', upload.single('image'), updateProduct); // Handle image upload for updating a product
 router.delete('/:id', deleteProduct); // Delete a product by ID

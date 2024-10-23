@@ -4,10 +4,19 @@ const jwt = require('jsonwebtoken');
 
 // Register a new user
 const registerUser = async (req, res) => {
+  console.log('Received registration data:', JSON.stringify(req.body, null, 2));
+
   const { firstName, lastName, email, password, phoneNumber } = req.body;
 
   // Input validation
   if (!firstName || !lastName || !email || !password || !phoneNumber) {
+    console.log('Missing required fields:', { 
+      firstName: !!firstName, 
+      lastName: !!lastName, 
+      email: !!email, 
+      password: !!password, 
+      phoneNumber: !!phoneNumber 
+    });
     return res.status(400).json({ message: 'All fields are required' });
   }
 
@@ -18,27 +27,60 @@ const registerUser = async (req, res) => {
       return res.status(400).json({ message: 'Email already exists' });
     }
 
-    // Hash the password
-    const hashedPassword = await bcrypt.hash(password, 10);
-
     // Create a new user
     const newUser = new User({
-      firstName,
-      lastName,
-      email,
-      password: hashedPassword,
-      phoneNumber,
+      firstName: firstName.trim(),
+      lastName: lastName.trim(),
+      email: email.toLowerCase().trim(),
+      password, // The model will hash this automatically
+      phoneNumber: phoneNumber.trim(),
     });
+
+    console.log('New user object:', JSON.stringify(newUser.toObject(), null, 2));
 
     // Save the user to the database
     await newUser.save();
 
-    res.status(201).json({ message: 'User registered successfully' });
+    // Generate a JWT token for the new user
+    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
+      expiresIn: '24h',
+    });
+
+    // Set the token in an HTTP-only cookie
+    res.cookie('token', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'Strict',
+      maxAge: 24 * 60 * 60 * 1000, // 24 hours
+    });
+
+    // Return success response with user data
+    res.status(201).json({
+      message: 'User registered successfully',
+      user: {
+        userId: newUser._id,
+        firstName: newUser.firstName,
+        lastName: newUser.lastName,
+        email: newUser.email,
+        phoneNumber: newUser.phoneNumber,
+        role: newUser.role,
+      },
+      token,
+    });
+
   } catch (error) {
     console.error('Error during registration:', error);
+    if (error.name === 'ValidationError') {
+      const validationErrors = Object.values(error.errors).map(err => err.message);
+      return res.status(400).json({ message: 'Validation failed', errors: validationErrors });
+    }
+    // Log the full error stack trace
+    console.error('Full error:', error.stack);
     res.status(500).json({ message: 'Registration failed', error: error.message });
   }
 };
+
+
 
 // Login user
 const loginUser = async (req, res) => {
@@ -80,7 +122,7 @@ const loginUser = async (req, res) => {
       message: 'Login successful',
       user: {
         userId: user._id,
-        token: generatedToken,
+        token: token,
         firstName: user.firstName,
         lastName: user.lastName,
         email: user.email,
