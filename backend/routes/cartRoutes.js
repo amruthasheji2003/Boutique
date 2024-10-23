@@ -6,17 +6,18 @@ const authMiddleware = require('../middleware/authMiddleware');
 // Apply auth middleware to all cart routes
 router.use(authMiddleware);
 
-// Get the user's cart
-router.get('/', cartController.getCart);
-
-// Add an item to the cart
+// Add item to cart
 router.post('/add', cartController.addToCart);
 
-// Update the quantity of an item in the cart
-router.put('/', cartController.updateCartItem);  
-
-// Remove an item from the cart
+// Remove item from cart
 router.delete('/remove/:productId', cartController.removeFromCart);
-// Clear the entire cart
+
+// Update item quantity in cart
+router.put('/update/:productId', cartController.updateCartItemQuantity);
+
+// Get cart contents
+router.get('/', cartController.getCart);
+
 router.delete('/clear', cartController.clearCart);
+
 module.exports = router;

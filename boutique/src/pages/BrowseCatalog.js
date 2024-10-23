@@ -103,6 +103,10 @@ const BrowseCatalog = () => {
     }
   };
 
+  const handleGoBack = () => {
+    navigate(-1);
+  }
+
   const handleAddToCart = async (product) => {
     try {
       const token = localStorage.getItem('token');
@@ -112,7 +116,7 @@ const BrowseCatalog = () => {
       }
 
       const response = await axios.post(`${API_URL}/api/cart/add`, {
-        productId: product.productId,
+        productId: product._id,
         quantity: 1
       }, {
         headers: {
@@ -128,7 +132,12 @@ const BrowseCatalog = () => {
       }
     } catch (err) {
       console.error('Error adding to cart:', err);
-      setCartMessage({ text: err.response?.data?.message || err.message || 'Failed to add item to cart. Please try again.', type: 'error' });
+      if (err.response && err.response.status === 401) {
+        localStorage.removeItem('token');
+        setCartMessage({ text: 'Your session has expired. Please log in again.', type: 'error' });
+      } else {
+        setCartMessage({ text: err.response?.data?.message || err.message || 'Failed to add item to cart. Please try again.', type: 'error' });
+      }
     }
     setTimeout(() => {
       setCartMessage(null);
@@ -169,6 +178,7 @@ const BrowseCatalog = () => {
     <div className="flex flex-col min-h-screen bg-gray-100 relative">
       <header className='h-16 shadow-md bg-white fixed w-full z-30'>
         <div className='container mx-auto flex items-center justify-between px-4 h-full'>
+          
           <Link to="/">
             <img src={logo} alt="Tailor's Touch Logo" className="h-12 mr-2" />
           </Link>
@@ -202,8 +212,17 @@ const BrowseCatalog = () => {
                 </span>
               )}
             </Link>
+            <button 
+            onClick={handleGoBack}
+            className="text-gray-600 hover:text-gray-900 transition-colors duration-300 flex items-center"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+          </button>
           </nav>
         </div>
+        
       </header>
 
       <main className="flex-grow container mx-auto px-4 pt-20 pb-8"> 
