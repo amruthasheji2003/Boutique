@@ -153,11 +153,35 @@ const getProductById = async (req, res) => {
   const { id } = req.params;
 
   try {
-    const product = await Product.findById(id).populate('category').populate('subcategory');
+    const product = await Product.findById(id)
+      .populate('category')
+      .populate('subcategory')
+      .lean(); // Use lean() for better performance
+
     if (!product) {
       return res.status(404).json({ message: 'Product not found' });
     }
-    res.status(200).json(product);
+
+    // Calculate average price and total stock
+    const totalStock = product.batches.reduce((sum, batch) => sum + batch.stock, 0);
+    const averagePrice = product.batches.reduce((sum, batch) => sum + batch.finalPrice * batch.stock, 0) / totalStock;
+
+    // Prepare the response object with additional details
+    const productDetails = {
+      ...product,
+      totalStock,
+      averagePrice: averagePrice.toFixed(2),
+      imageUrl: `${req.protocol}://${req.get('host')}/${product.image}`, // Full image URL
+      batchesCount: product.batches.length,
+      latestBatch: product.batches.sort((a, b) => b.productionDate - a.productionDate)[0],
+      oldestBatch: product.batches.sort((a, b) => a.productionDate - b.productionDate)[0],
+      priceRange: {
+        min: Math.min(...product.batches.map(b => b.finalPrice)),
+        max: Math.max(...product.batches.map(b => b.finalPrice))
+      }
+    };
+
+    res.status(200).json(productDetails);
   } catch (error) {
     console.error('Error fetching product:', error);
     res.status(500).json({ message: 'Error fetching product', error: error.message });

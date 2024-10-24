@@ -13,7 +13,6 @@ import BrowseCatalog from '../pages/BrowseCatalog';
 import CustomDressOrder from '../pages/CustomDressOrder';
 import Wishlist from '../pages/Wishlist';
 import Cart from '../pages/Cart';
-import DressStyleSelection from '../pages/DressStyleSelection';
 import ForgotPassword from '../pages/ForgotPassword';
 import Profile from '../pages/Profile';
 import AdminPage from '../pages/AdminPage';
@@ -46,7 +45,6 @@ const router = createBrowserRouter([
             { path: "custom-orders", element: <CustomDressOrder /> },
             { path: "wishlist", element: <Wishlist /> },
             { path: "cart", element: <Cart /> },
-            { path: "dress-style-selection", element: <DressStyleSelection /> },
             { path: "forgot-password", element: <ForgotPassword /> },
             { path: "manage-materials", element: <MaterialManagement /> },
             { path: "manage-products/:id", element:<ManageProducts />},
@@ -62,7 +60,8 @@ const router = createBrowserRouter([
                     { path: "manage-subcategories", element: <ManageSubcategories /> },
                     { path: "view-products", element: <ViewProducts /> },
                     { path: " manage-products/${id}", element: <ManageProducts/>},
-                    { path: "edit-product/:id", element: <EditProduct /> }
+                    { path: "edit-product/:id", element: <EditProduct /> },
+                    { path: "product-details/:id", element: <ProductDetails /> },
                     
                 ]
             },

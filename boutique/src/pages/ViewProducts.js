@@ -51,6 +51,10 @@ const ViewProducts = () => {
     setSearchTerm(e.target.value);
     setCurrentPage(1);
   };
+  const handleViewDetails = (productId) => {
+    navigate(`/admin/product-details/${productId}`);
+  };
+
 
   const handleEdit = (productId) => {
     navigate(`/admin/edit-product/${productId}`);
@@ -111,12 +115,12 @@ const ViewProducts = () => {
                 <td className="px-4 py-2">{product.subcategory.name}</td>
                 <td className="px-4 py-2">{product.finalStock}</td>
                 <td className="px-4 py-2">
-                  <Link 
-                    to={`/products/${product._id}`}
-                    className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded mr-2"
-                  >
-                    View
-                  </Link>
+                <button
+                  onClick={() => handleViewDetails(product._id)}
+                  className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded mr-2"
+                >
+                  View Details
+                </button>
                   <button 
                     onClick={() => handleEdit(product._id)}
                     className="bg-green-500 hover:bg-green-700 text-white font-bold py-1 px-2 rounded mr-2"
