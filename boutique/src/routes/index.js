@@ -25,7 +25,7 @@ import ViewProducts from '../pages/ViewProducts';
 import EditProduct from '../pages/EditProduct';
 import ProductDetails from '../pages/ProductDetails';
 import AboutUs from '../pages/AboutUs';
-
+import ProductInfo from '../pages/ProductInfo';
 const router = createBrowserRouter([
     {
         path: "/",
@@ -49,6 +49,7 @@ const router = createBrowserRouter([
             { path: "manage-materials", element: <MaterialManagement /> },
             { path: "manage-products/:id", element:<ManageProducts />},
             { path: "about-us", element:<AboutUs />},
+            { path: "product-info/:id", element:<ProductInfo />},
             // Admin routes
             {
                 path: "admin",

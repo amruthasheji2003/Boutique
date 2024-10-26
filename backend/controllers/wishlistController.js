@@ -32,31 +32,37 @@ exports.addToWishlist = async (req, res) => {
     await wishlist.save();
     await wishlist.populate('products');
 
-    res.status(200).json({ message: 'Product added to wishlist', wishlist });
+    res.status(200).json({ 
+      message: 'Product added to wishlist', 
+      wishlist // Send the entire wishlist object
+    });
   } catch (error) {
     console.error('Error adding to wishlist:', error);
     res.status(500).json({ message: 'Error adding to wishlist', error: error.message });
   }
 };
 exports.removeFromWishlist = async (req, res) => {
-    try {
-      const { productId } = req.params;
-      const userId = req.user.userId;
-  
-      const wishlist = await Wishlist.findOne({ user: userId });
-      if (!wishlist) {
-        return res.status(404).json({ message: 'Wishlist not found' });
-      }
-  
-      wishlist.products = wishlist.products.filter(id => id.toString() !== productId);
-      await wishlist.save();
-  
-      res.status(200).json({ message: 'Product removed from wishlist', wishlist });
-    } catch (error) {
-      console.error('Error removing from wishlist:', error);
-      res.status(500).json({ message: 'Error removing from wishlist', error: error.message });
+  try {
+    const { productId } = req.params;
+    const userId = req.user.userId;
+
+    let wishlist = await Wishlist.findOne({ user: userId });
+    if (!wishlist) {
+      return res.status(404).json({ message: 'Wishlist not found' });
     }
-  };
+
+    wishlist.products = wishlist.products.filter(id => id.toString() !== productId);
+    await wishlist.save();
+
+    // Populate the products after removing the item
+    await wishlist.populate('products');
+
+    res.status(200).json({ message: 'Product removed from wishlist', wishlist });
+  } catch (error) {
+    console.error('Error removing from wishlist:', error);
+    res.status(500).json({ message: 'Error removing from wishlist', error: error.message });
+  }
+};
 exports.getWishlist = async (req, res) => {
     try {
       const userId = req.user.userId;

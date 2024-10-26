@@ -62,18 +62,11 @@ function Wishlist() {
       if (response.data && response.data.wishlist) {
         // Update the wishlist state with the new data from the server
         setWishlist(response.data.wishlist);
-        setWishlistMessage({ text: 'Product removed from wishlist successfully!', type: 'success' });
       } else {
-        // If the server doesn't return the updated wishlist, update the local state
-        setWishlist(prevWishlist => ({
-          ...prevWishlist,
-          products: prevWishlist.products.filter(id => id.toString() !== productId)
-        }));
-        setWishlistMessage({ text: 'Product removed from wishlist', type: 'success' });
+        // If the server doesn't return the updated wishlist, fetch it again
+        await fetchWishlist();
       }
-  
-      // Optionally, you can trigger a re-fetch of the wishlist here
-      // fetchWishlist();
+      setWishlistMessage({ text: 'Product removed from wishlist successfully!', type: 'success' });
     } catch (err) {
       console.error('Error removing item from wishlist:', err);
       if (err.response && err.response.status === 404) {
@@ -84,6 +77,8 @@ function Wishlist() {
           type: 'error' 
         });
       }
+      // Fetch the wishlist again in case of an error
+      await fetchWishlist();
     }
   };
   const clearWishlist = async () => {
@@ -138,6 +133,10 @@ function Wishlist() {
       setWishlistMessage({ text: err.response?.data?.message || err.message || 'Failed to add item to cart. Please try again.', type: 'error' });
     }
   };
+
+
+ 
+
 
   const handleGoBack = () => {
     navigate(-1);

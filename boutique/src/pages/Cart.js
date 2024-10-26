@@ -27,7 +27,13 @@ function Cart() {
         }
       });
       console.log('Cart data received:', response.data);
-      setCart(response.data.cart);
+      if (response.data && response.data.cart) {
+        // Filter out items with null products
+        const filteredItems = response.data.cart.items.filter(item => item && item.product);
+        setCart({...response.data.cart, items: filteredItems});
+      } else {
+        setCart(null);
+      }
       setLoading(false);
     } catch (err) {
       console.error('Error fetching cart:', err);
@@ -163,48 +169,50 @@ function Cart() {
         ) : (
           <div className="space-y-4">
             {cart.items.map((item) => (
-              <div key={item.product._id} className="bg-white p-4 rounded-lg shadow flex items-center">
-                <img 
-                  src={item.product.image ? `${API_BASE_URL}/${item.product.image}` : '/placeholder-image.jpg'}
-                  alt={item.product.name}
-                  className="w-24 h-24 object-cover mr-4 rounded"
-                  onError={(e) => {
-                    e.target.onerror = null;
-                    e.target.src = '/placeholder-image.jpg';
-                  }}
-                />
-                <div className="flex-grow">
-                  <h3 className="text-lg font-semibold">{item.product.name}</h3>
-                  <p className="text-gray-600">Price: Rs.{item.price.toFixed(2)}</p>
-                  <div className="flex items-center mt-2">
-                    <button 
-                      onClick={() => updateCartItem(item.product._id, item.quantity - 1)} 
-                      disabled={item.quantity <= 1}
-                      className="bg-gray-200 px-2 py-1 rounded-l disabled:opacity-50"
-                    >
-                      -
-                    </button>
-                    <span className="px-4 py-1 bg-gray-100">{item.quantity}</span>
-                    <button 
-                      onClick={() => updateCartItem(item.product._id, item.quantity + 1)}
-                      className="bg-gray-200 px-2 py-1 rounded-r"
-                    >
-                      +
-                    </button>
+              item && item.product ? (
+                <div key={item.product._id} className="bg-white p-4 rounded-lg shadow flex items-center">
+                  <img 
+                    src={item.product.image ? `${API_BASE_URL}/${item.product.image}` : '/placeholder-image.jpg'}
+                    alt={item.product.name}
+                    className="w-24 h-24 object-cover mr-4 rounded"
+                    onError={(e) => {
+                      e.target.onerror = null;
+                      e.target.src = '/placeholder-image.jpg';
+                    }}
+                  />
+                  <div className="flex-grow">
+                    <h3 className="text-lg font-semibold">{item.product.name}</h3>
+                    <p className="text-gray-600">Price: Rs.{item.price.toFixed(2)}</p>
+                    <div className="flex items-center mt-2">
+                      <button 
+                        onClick={() => updateCartItem(item.product._id, item.quantity - 1)} 
+                        disabled={item.quantity <= 1}
+                        className="bg-gray-200 px-2 py-1 rounded-l disabled:opacity-50"
+                      >
+                        -
+                      </button>
+                      <span className="px-4 py-1 bg-gray-100">{item.quantity}</span>
+                      <button 
+                        onClick={() => updateCartItem(item.product._id, item.quantity + 1)}
+                        className="bg-gray-200 px-2 py-1 rounded-r"
+                      >
+                        +
+                      </button>
+                    </div>
                   </div>
+                  <button 
+                    onClick={() => removeFromCart(item.product._id)}
+                    className="ml-4 text-red-500 hover:text-red-700 transition-colors duration-300"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                  </button>
                 </div>
-                <button 
-                  onClick={() => removeFromCart(item.product._id)}
-                  className="ml-4 text-red-500 hover:text-red-700 transition-colors duration-300"
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                  </svg>
-                </button>
-              </div>
+              ) : null
             ))}
             <div className="mt-6 text-right text-xl font-bold">
-              Total: Rs.{cart.items.reduce((total, item) => total + item.price * item.quantity, 0).toFixed(2)}
+              Total: Rs.{cart.items.reduce((total, item) => total + (item.price || 0) * (item.quantity || 0), 0).toFixed(2)}
             </div>
             <div className="flex justify-end mt-4">
               <button 
