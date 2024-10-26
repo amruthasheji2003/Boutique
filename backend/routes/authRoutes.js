@@ -3,8 +3,6 @@ const router = express.Router();
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
-const upload = require('../config/multer');
-const authController = require('../controllers/authController');
 
 // Use environment variable for JWT_SECRET
 const JWT_SECRET = process.env.JWT_SECRET;
@@ -116,14 +114,5 @@ router.get('/users', verifyToken, async (req, res) => {
         res.status(500).json({ message: err.message });
     }
 });
-router.get('/profile', verifyToken, authController.getProfile);
-
-// Update user profile (Protected Route)
-router.put('/profile', verifyToken, upload.single('profileImage'), authController.updateProfile);
-
-// Change password (Protected Route)
-router.put('/change-password', verifyToken, authController.changePassword);
-
-
 
 module.exports = router;
