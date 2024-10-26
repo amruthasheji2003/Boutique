@@ -14,7 +14,7 @@ const subcategoryRoutes = require('./routes/subcategoryRoutes');
 const batchRoutes = require('./routes/batchRoutes');
 const cartRoutes = require('./routes/cartRoutes');
 const wishlistRoutes = require('./routes/wishlistRoutes');
-
+const measurementRoutes = require('./routes/measurementRoutes');
 // Initialize Express app
 const app = express();
 
@@ -47,7 +47,7 @@ app.use('/api/subcategory', subcategoryRoutes);
 app.use('/api', batchRoutes);
 app.use('/api/cart', cartRoutes);
 app.use('/api/wishlist', wishlistRoutes);
-
+app.use('/api/measurements',measurementRoutes);
 
 
 
