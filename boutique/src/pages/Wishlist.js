@@ -56,19 +56,36 @@ function Wishlist() {
           Authorization: `Bearer ${localStorage.getItem('token')}`
         }
       });
-      
+  
+      console.log('Server response:', response.data);
+  
       if (response.data && response.data.wishlist) {
+        // Update the wishlist state with the new data from the server
         setWishlist(response.data.wishlist);
-        setWishlistMessage({ text: 'Item removed from wishlist successfully!', type: 'success' });
+        setWishlistMessage({ text: 'Product removed from wishlist successfully!', type: 'success' });
       } else {
-        throw new Error('Invalid response from server');
+        // If the server doesn't return the updated wishlist, update the local state
+        setWishlist(prevWishlist => ({
+          ...prevWishlist,
+          products: prevWishlist.products.filter(id => id.toString() !== productId)
+        }));
+        setWishlistMessage({ text: 'Product removed from wishlist', type: 'success' });
       }
+  
+      // Optionally, you can trigger a re-fetch of the wishlist here
+      // fetchWishlist();
     } catch (err) {
       console.error('Error removing item from wishlist:', err);
-      setWishlistMessage({ text: err.response?.data?.message || err.message || 'Failed to remove item from wishlist. Please try again.', type: 'error' });
+      if (err.response && err.response.status === 404) {
+        setWishlistMessage({ text: 'Wishlist not found', type: 'error' });
+      } else {
+        setWishlistMessage({ 
+          text: err.response?.data?.message || 'Failed to remove item from wishlist. Please try again.', 
+          type: 'error' 
+        });
+      }
     }
   };
-
   const clearWishlist = async () => {
     try {
       const response = await axios.delete(`${API_BASE_URL}/api/wishlist/clear`, {
