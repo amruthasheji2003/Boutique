@@ -93,17 +93,29 @@ function Wishlist() {
           Authorization: `Bearer ${localStorage.getItem('token')}`
         }
       });
+  
+      console.log('Server response:', response.data);
+  
       if (response.data && response.data.message) {
-        setWishlist({ products: [] });
-        setWishlistMessage({ text: response.data.message, type: 'success' });
+        // Clear the wishlist in the local state
+        setWishlist({ products: [] });  // Changed from 'items' to 'products'
+        setWishlistMessage({ text: 'Wishlist cleared successfully', type: 'success' });
       } else {
         throw new Error('Invalid response from server');
       }
     } catch (err) {
       console.error('Error clearing wishlist:', err);
-      setWishlistMessage({ text: err.response?.data?.message || err.message || 'Failed to clear wishlist. Please try again.', type: 'error' });
+      if (err.response && err.response.status === 404) {
+        setWishlistMessage({ text: 'Wishlist not found', type: 'error' });
+      } else {
+        setWishlistMessage({ 
+          text: err.response?.data?.message || 'Failed to clear wishlist. Please try again.', 
+          type: 'error' 
+        });
+      }
     }
   };
+
 
   const addToCart = async (productId) => {
     try {

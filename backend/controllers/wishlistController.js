@@ -45,20 +45,18 @@ exports.removeFromWishlist = async (req, res) => {
   
       const wishlist = await Wishlist.findOne({ user: userId });
       if (!wishlist) {
-        return res.status(404).json({ message: 'wishlist not found' });
+        return res.status(404).json({ message: 'Wishlist not found' });
       }
   
-      wishlist.items = wishlist.items.filter(item => item.product.toString() !== productId);
+      wishlist.products = wishlist.products.filter(id => id.toString() !== productId);
       await wishlist.save();
-      await wishlist.populate('items.product');
   
       res.status(200).json({ message: 'Product removed from wishlist', wishlist });
     } catch (error) {
-      console.error('Error removing from wishlsit:', error);
+      console.error('Error removing from wishlist:', error);
       res.status(500).json({ message: 'Error removing from wishlist', error: error.message });
     }
   };
-
 exports.getWishlist = async (req, res) => {
     try {
       const userId = req.user.userId;
@@ -74,22 +72,26 @@ exports.getWishlist = async (req, res) => {
       res.status(500).json({ message: 'Error fetching wishlist', error: error.message });
     }
   };
-
-exports.clearWishlist = async (req, res) => {
-  try {
-    const userId = req.user.id;
-
-    const wishlist = await Wishlist.findOne({ user: userId });
-
-    if (!wishlist) {
-      return res.status(404).json({ message: 'Wishlist not found' });
+  exports.clearWishlist = async (req, res) => {
+    try {
+      const userId = req.user.userId;
+  
+      // Find the user's wishlist
+      let wishlist = await Wishlist.findOne({ user: userId });
+  
+      if (!wishlist) {
+        return res.status(404).json({ message: 'Wishlist not found' });
+      }
+  
+      // Clear the products array
+      wishlist.products = [];
+  
+      // Save the updated wishlist
+      await wishlist.save();
+  
+      res.status(200).json({ message: 'Wishlist cleared successfully', wishlist });
+    } catch (error) {
+      console.error('Error clearing wishlist:', error);
+      res.status(500).json({ message: 'Error clearing wishlist', error: error.message });
     }
-
-    wishlist.products = [];
-    await wishlist.save();
-
-    res.status(200).json({ message: 'Wishlist cleared', wishlist });
-  } catch (error) {
-    res.status(500).json({ message: 'Error clearing wishlist', error: error.message });
-  }
-};
+  };
