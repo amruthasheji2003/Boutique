@@ -24,6 +24,7 @@ const BrowseCatalog = () => {
   const [wishlist, setWishlist] = useState([]);
   const [cart, setCart] = useState([]);
   const [cartMessage, setCartMessage] = useState(null);
+  const [wishlistMessage, setWishlistMessage] = useState(null);
 
   const navigate = useNavigate();
 
@@ -31,6 +32,7 @@ const BrowseCatalog = () => {
     fetchProducts();
     fetchCategories();
     fetchCart();
+    fetchWishlist();
   }, []);
 
   useEffect(() => {
@@ -85,6 +87,26 @@ const BrowseCatalog = () => {
       setCart(response.data);
     } catch (err) {
       console.error('Error fetching cart:', err);
+      if (err.response && err.response.status === 401) {
+        console.log('Unauthorized, clearing token');
+        localStorage.removeItem('token');
+      }
+    }
+  };
+
+  const fetchWishlist = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) return;
+
+      const response = await axios.get(`${API_URL}/api/wishlist`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      setWishlist(response.data);
+    } catch (err) {
+      console.error('Error fetching wishlist:', err);
       if (err.response && err.response.status === 401) {
         console.log('Unauthorized, clearing token');
         localStorage.removeItem('token');
@@ -161,11 +183,40 @@ const BrowseCatalog = () => {
     setSearchTerm(e.target.value);
   };
 
-  const addToWishlist = (product) => {
-    if (!wishlist.some(item => item._id === product._id)) {
-      setWishlist([...wishlist, product]);
-      console.log(`Added ${product.name} to wishlist`);
+  const handleAddToWishlist = async (product) => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        setWishlistMessage({ text: 'Please log in to add items to wishlist.', type: 'error' });
+        return;
+      }
+  
+      const response = await axios.post(`${API_URL}/api/wishlist/add`, {
+        productId: product._id
+      }, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      if (response.data && response.data.wishlist) {
+        // Update the wishlist state by adding the new product
+        setWishlist(response.data.wishlist);
+        setWishlistMessage({ text: `${product.name} added to wishlist successfully!`, type: 'success' });
+      } else {
+        throw new Error('Invalid response from server');
+      }
+    } catch (err) {
+      console.error('Error adding to wishlist:', err);
+      if (err.response && err.response.status === 401) {
+        localStorage.removeItem('token');
+        setWishlistMessage({ text: 'Your session has expired. Please log in again.', type: 'error' });
+      } else {
+        setWishlistMessage({ text: err.response?.data?.message || err.message || 'Failed to add item to wishlist. Please try again.', type: 'error' });
+      }
     }
+    setTimeout(() => {
+      setWishlistMessage(null);
+    }, 3000);
   };
 
   const filteredProducts = products.filter(product => 
@@ -284,7 +335,7 @@ const BrowseCatalog = () => {
                     <button 
                       onClick={(e) => {
                         e.stopPropagation();
-                        addToWishlist(product);
+                        handleAddToWishlist(product);
                       }}
                       className="absolute top-2 right-2 p-2 bg-white rounded-full shadow-md text-gray-600 hover:text-pink-500 transition-colors duration-300"
                       title="Add to Wishlist"
@@ -330,6 +381,16 @@ const BrowseCatalog = () => {
           } text-white z-50 transition-opacity duration-300`}
         >
           {cartMessage.text}
+        </div>
+      )}
+
+      {wishlistMessage && (
+        <div 
+          className={`fixed bottom-4 left-4 p-4 rounded-md shadow-lg ${
+            wishlistMessage.type === 'success' ? 'bg-green-500' : 'bg-red-500'
+          } text-white z-50 transition-opacity duration-300`}
+        >
+          {wishlistMessage.text}
         </div>
       )}
     </div>

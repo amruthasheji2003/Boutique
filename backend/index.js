@@ -7,13 +7,13 @@ require('dotenv').config(); // Load environment variables
 // Import routes
 const authRoutes = require('./routes/authRoutes');
 const adminRoutes = require('./routes/adminRoutes');
-const productRoutes = require('./routes/productRoutes');
-const profileRoutes = require('./routes/profileRoutes'); // Uncomment if you're using profile routes
+const productRoutes = require('./routes/productRoutes'); // Uncomment if you're using profile routes
 const categoryRoutes = require('./routes/categoryRoutes'); // Import category routes
 const authMiddleware = require('./middleware/authMiddleware');
 const subcategoryRoutes = require('./routes/subcategoryRoutes');
 const batchRoutes = require('./routes/batchRoutes');
 const cartRoutes = require('./routes/cartRoutes');
+const wishlistRoutes = require('./routes/wishlistRoutes');
 
 // Initialize Express app
 const app = express();
@@ -39,14 +39,14 @@ mongoose.connect(MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true 
 // Define API routes
 app.use('/api/auth', authRoutes);
 app.use('/api/admin', adminRoutes);
-app.use('/api/products', productRoutes);
-app.use('/api/profile', authMiddleware, profileRoutes); // Uncomment if using profile routes
+app.use('/api/products', productRoutes);// Uncomment if using profile routes
 app.use('/api/category', categoryRoutes); // Ensure categoryRoutes is valid
 app.use('/api/categories', categoryRoutes); // Ensure this matches your routing
 app.use('/api/subcategories', subcategoryRoutes);
 app.use('/api/subcategory', subcategoryRoutes);
 app.use('/api', batchRoutes);
 app.use('/api/cart', cartRoutes);
+app.use('/api/wishlist', wishlistRoutes);
 
 
 

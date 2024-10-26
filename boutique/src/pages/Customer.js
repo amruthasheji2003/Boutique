@@ -1,22 +1,66 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { FaShoppingCart, FaHeart, FaSearch } from 'react-icons/fa';
+import { FaShoppingCart, FaHeart, FaSearch, FaUserCircle, FaCaretDown } from 'react-icons/fa';
+import axios from 'axios';
 import logo from '../assets/logo.png'; // Update this path to your logo's location
-import backgroundImage from '../assets/customer.jpg'; // Update this path to your background image's location
+import backgroundImage from '../assets/customer.jpg'; 
+
+const API_URL = 'http://localhost:8080';
 
 const Customer = () => {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
+  const [user, setUser] = useState(null);
+  const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      setIsLoading(true);
+      try {
+        const token = localStorage.getItem('token');
+        if (!token) {
+          navigate('/login');
+          return;
+        }
+
+        const response = await axios.get(`${API_URL}/api/auth/profile`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        setUser(response.data);
+        setError(null);
+      } catch (error) {
+        console.error('Error fetching user profile:', error);
+        setError('Failed to load user profile');
+        if (error.response && error.response.status === 401) {
+          localStorage.removeItem('token');
+          navigate('/login');
+        }
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchUserProfile();
+  }, [navigate]);
+
 
   const handleLogout = () => {
-    // Add your logout logic here (e.g., clear tokens, redirect to login page)
-    navigate('/'); // Redirect to login page after logout
+    localStorage.removeItem('token');
+    localStorage.removeItem('userProfile');
+    navigate('/login'); // Redirect to login page after logout
   };
 
   const handleSearch = () => {
     if (searchTerm.trim()) {
       navigate(`/browse-catalog?search=${encodeURIComponent(searchTerm.trim())}`);
     }
+  };
+
+  const toggleProfileDropdown = () => {
+    setIsProfileDropdownOpen(!isProfileDropdownOpen);
   };
 
   return (
@@ -65,7 +109,7 @@ const Customer = () => {
           {/* User-related actions */}
           <div className="flex items-center space-x-6">
             <Link
-              to="/" // Navigate to home page
+              to="/"
               className="hover:text-pink-500 transition-colors duration-300"
             >
               Home
@@ -88,25 +132,68 @@ const Customer = () => {
             >
               <FaShoppingCart className="text-xl" />
             </button>
-            {/* Logout button inside a rectangular box */}
-            <div className="bg-gray-200 rounded-md px-4 py-2 shadow-md">
-              <button
-                onClick={handleLogout}
-                className="text-black hover:text-pink-500 transition-colors duration-300"
-              >
-                Logout
-              </button>
-            </div>
+
+
+            {user && (
+              <div className="relative">
+                <button
+                  onClick={toggleProfileDropdown}
+                  className="flex items-center space-x-2 hover:text-pink-500 transition-colors duration-300"
+                >
+                  {user.profileImage ? (
+                    <img
+                      src={`/${user.profileImage}`}
+                      alt="Profile"
+                      className="w-8 h-8 rounded-full object-cover"
+                    />
+                  ) : (
+                    <FaUserCircle className="w-8 h-8 text-gray-600" />
+                  )}
+                  <span>{user.firstName}</span>
+                  <FaCaretDown />
+                </button>
+                {isProfileDropdownOpen && (
+                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50">
+                    <div className="px-4 py-2 text-sm text-gray-700">
+                      <p>{user.firstName} {user.lastName}</p>
+                      <p className="text-xs text-gray-500">{user.email}</p>
+                    </div>
+                    <hr />
+                    <Link
+                      to="/profile"
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    >
+                      Edit Profile
+                    </Link>
+                    <div className="bg-gray-200 rounded-md px-4 py-2 shadow-md">
+                      <button
+                        onClick={handleLogout}
+                        className="text-black hover:text-pink-500 transition-colors duration-300"
+                      >
+                        Logout
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         </div>
       </header>
 
       {/* Main content area */}
       <div className="flex flex-grow items-center justify-center mt-20">
-        <h1 className="text-white text-5xl font-bold">Hey, WELCOME!</h1>
+        {isLoading ? (
+          <p className="text-white text-2xl">Loading...</p>
+        ) : error ? (
+          <p className="text-white text-2xl">{error}</p>
+        ) : user ? (
+          <h1 className="text-white text-5xl font-bold">Welcome, {user.firstName}!</h1>
+        ) : (
+          <p className="text-white text-2xl">No user data available</p>
+        )}
       </div>
     </div>
   );
 };
-
 export default Customer;
