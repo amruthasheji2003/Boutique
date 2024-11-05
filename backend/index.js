@@ -15,6 +15,8 @@ const batchRoutes = require('./routes/batchRoutes');
 const cartRoutes = require('./routes/cartRoutes');
 const wishlistRoutes = require('./routes/wishlistRoutes');
 const measurementRoutes = require('./routes/measurementRoutes');
+const customizationRoutes = require('./routes/customizationRoutes');
+
 // Initialize Express app
 const app = express();
 
@@ -48,6 +50,7 @@ app.use('/api', batchRoutes);
 app.use('/api/cart', cartRoutes);
 app.use('/api/wishlist', wishlistRoutes);
 app.use('/api/measurements',measurementRoutes);
+app.use('/api/customizations',customizationRoutes);
 
 
 

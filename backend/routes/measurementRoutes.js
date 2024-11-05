@@ -3,7 +3,13 @@ const router = express.Router();
 const measurementController = require('../controllers/measurementController');
 const authMiddleware = require('../middleware/authMiddleware');
 
-router.post('/add', authMiddleware, measurementController.addMeasurement);
-router.get('/:productId', authMiddleware, measurementController.getMeasurement);
+router.use(authMiddleware);
+
+
+router.post('/add', measurementController.addMeasurement);
+router.get('/:productId', measurementController.getMeasurement);
+router.get('/', measurementController.getAllMeasurements);
+router.delete('/:measurementId', measurementController.deleteMeasurement);
+
 
 module.exports = router;

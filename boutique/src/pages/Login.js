@@ -60,10 +60,11 @@ const Login = () => {
       });
 
       const userData = await userResponse.json();
-
+      console.log(userData);
       if (userResponse.status === 200) {
         localStorage.setItem('token', userData.token);
-        localStorage.setItem('userId', userData.userId); 
+        localStorage.setItem('userId', userData.user.userId);
+        localStorage.setItem('name', userData.user.firstName); 
         setSuccessMessage('User login successful! Redirecting...');
         setTimeout(() => {
           navigate('/Customer');

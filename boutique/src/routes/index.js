@@ -10,7 +10,6 @@ import PlaceOrder from '../pages/PlaceOrder';
 import FabricSelection from '../pages/FabricSelection';
 import ColorSelection from '../pages/ColorSelection';
 import BrowseCatalog from '../pages/BrowseCatalog';
-import CustomDressOrder from '../pages/CustomDressOrder';
 import Wishlist from '../pages/Wishlist';
 import Cart from '../pages/Cart';
 import ForgotPassword from '../pages/ForgotPassword';
@@ -26,6 +25,7 @@ import EditProduct from '../pages/EditProduct';
 import ProductDetails from '../pages/ProductDetails';
 import AboutUs from '../pages/AboutUs';
 import ProductInfo from '../pages/ProductInfo';
+import CustomizationForm from '../pages/CustomizationForm';
 const router = createBrowserRouter([
     {
         path: "/",
@@ -42,7 +42,6 @@ const router = createBrowserRouter([
             { path: "fabric-selection", element: <FabricSelection /> },
             { path: "color-selection", element: <ColorSelection /> },
             { path: "browse-catalog", element: <BrowseCatalog /> },
-            { path: "custom-orders", element: <CustomDressOrder /> },
             { path: "wishlist", element: <Wishlist /> },
             { path: "cart", element: <Cart /> },
             { path: "forgot-password", element: <ForgotPassword /> },
@@ -50,6 +49,7 @@ const router = createBrowserRouter([
             { path: "manage-products/:id", element:<ManageProducts />},
             { path: "about-us", element:<AboutUs />},
             { path: "product-info/:id", element:<ProductInfo />},
+            { path: "customize/:id", element:<CustomizationForm />},
             // Admin routes
             {
                 path: "admin",

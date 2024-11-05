@@ -24,10 +24,14 @@ const Customer = () => {
           return;
         }
 
+        const name = localStorage.getItem('name');
+        setUser(name);
+        console.log(user);
+
+        // console.log(localStorage)
         const response = await axios.get(`${API_URL}/api/auth/profile`, {
           headers: { Authorization: `Bearer ${token}` }
         });
-        setUser(response.data);
         setError(null);
       } catch (error) {
         console.error('Error fetching user profile:', error);
@@ -101,7 +105,8 @@ const Customer = () => {
 
           {/* User-related actions */}
           <div className="flex items-center space-x-6">
-            <Link
+            <p>Welcome, {user}.</p>
+            {/* <Link
               to="/"
               className="hover:text-pink-500 transition-colors duration-300"
             >
@@ -112,7 +117,7 @@ const Customer = () => {
               className="hover:text-pink-500 transition-colors duration-300"
             >
               My Orders
-            </button>
+            </button> */}
             <button
               onClick={() => navigate('/wishlist')}
               className="hover:text-pink-500 transition-colors duration-300"

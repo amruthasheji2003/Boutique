@@ -52,3 +52,35 @@ exports.getMeasurement = async (req, res) => {
     res.status(500).json({ message: 'Error fetching measurement', error: error.message });
   }
 };
+exports.getAllMeasurements = async (req, res) => {
+    try {
+      const userId = req.user.userId;
+  
+      const measurements = await Measurement.find({ user: userId }).populate('product', 'name');
+  
+      res.status(200).json({ measurements });
+    } catch (error) {
+      console.error('Error fetching all measurements:', error);
+      res.status(500).json({ message: 'Error fetching all measurements', error: error.message });
+    }
+  };
+  
+  exports.deleteMeasurement = async (req, res) => {
+    try {
+      const { measurementId } = req.params;
+      const userId = req.user.userId;
+  
+      const measurement = await Measurement.findOne({ _id: measurementId, user: userId });
+  
+      if (!measurement) {
+        return res.status(404).json({ message: 'Measurement not found' });
+      }
+  
+      await Measurement.deleteOne({ _id: measurementId });
+  
+      res.status(200).json({ message: 'Measurement deleted successfully' });
+    } catch (error) {
+      console.error('Error deleting measurement:', error);
+      res.status(500).json({ message: 'Error deleting measurement', error: error.message });
+    }
+  };
