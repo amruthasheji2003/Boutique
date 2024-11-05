@@ -1,0 +1,24 @@
+{
+  "files": {
+    "main.css": "/static/css/main.946b697d.css",
+    "main.js": "/static/js/main.10a61ef4.js",
+    "static/js/453.badfec35.chunk.js": "/static/js/453.badfec35.chunk.js",
+    "static/media/newtt.jpg": "/static/media/newtt.7b1e4e1bcbff68c4d0bd.jpg",
+    "static/media/home13.jpg": "/static/media/home13.077b85bc223ad3bc4a68.jpg",
+    "static/media/product1.jpg": "/static/media/product1.9bc27f1a0b98fc7bf58a.jpg",
+    "static/media/loginimage.avif": "/static/media/loginimage.e422fefd82d181dc944c.avif",
+    "static/media/product2.webp": "/static/media/product2.0a7bc9a54d0a67bfaf63.webp",
+    "static/media/product3.webp": "/static/media/product3.e44178fe9678675a13fb.webp",
+    "static/media/logo.png": "/static/media/logo.6adae9a97b6e87e48f2f.png",
+    "static/media/customer.jpg": "/static/media/customer.48dec575b9bf65444bc9.jpg",
+    "static/media/fp.avif": "/static/media/fp.f1924d37cc5d19cf28bf.avif",
+    "index.html": "/index.html",
+    "main.946b697d.css.map": "/static/css/main.946b697d.css.map",
+    "main.10a61ef4.js.map": "/static/js/main.10a61ef4.js.map",
+    "453.badfec35.chunk.js.map": "/static/js/453.badfec35.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.946b697d.css",
+    "static/js/main.10a61ef4.js"
+  ]
+}
