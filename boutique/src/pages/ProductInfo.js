@@ -40,8 +40,8 @@ const ProductInfo = () => {
       try {
         const token = localStorage.getItem('token');
         const [productResponse, measurementResponse, cartResponse, wishlistResponse] = await Promise.all([
-          axios.get(`${API_URL}/api/products/${id}`),
-          axios.get(`${API_URL}/api/measurements/${id}`, {
+          axios.get(`https://boutique-backend-j6re.onrender.com/api/products/${id}`),
+          axios.get(`https://boutique-backend-j6re.onrender.com/api/measurements/${id}`, {
             headers: { Authorization: `Bearer ${token}` }
           }),
           axios.get(`${API_URL}/api/cart`, {
