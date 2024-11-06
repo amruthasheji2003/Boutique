@@ -35,7 +35,7 @@ const Customer = () => {
         setError(null);
       } catch (error) {
         console.error('Error fetching user profile:', error);
-        // setError('Failed to load user profile');
+        setError('Failed to load user profile');
         if (error.response && error.response.status === 401) {
           localStorage.removeItem('token');
           navigate('/login');

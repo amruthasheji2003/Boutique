@@ -3,7 +3,8 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
 import logo from '../assets/logo.png'; // Make sure this path is correct
 
-const API_URL = 'http://localhost:8080';
+
+const API_URL = 'https://boutique-backend-j6re.onrender.com'
 
 const ProductInfo = () => {
   const { id } = useParams();
