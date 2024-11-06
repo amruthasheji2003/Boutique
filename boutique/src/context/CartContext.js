@@ -10,7 +10,7 @@
 
 //     const fetchCart = async () => {
 //         try {
-//             const response = await axios.get(`http://localhost:8080/api/cart/${userId}`);
+//             const response = await axios.get(`https://boutique-backend-j6re.onrender.com/api/cart/${userId}`);
 //             setCart(response.data.items);
 //         } catch (error) {
 //             console.error('Error fetching cart:', error);

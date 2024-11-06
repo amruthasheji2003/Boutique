@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
 
-const API_URL = 'http://localhost:8080/api'; // Adjust this to match your API URL
+const API_URL = 'https://boutique-backend-j6re.onrender.com/api'; // Adjust this to match your API URL
 
 export default function Registration() {
   const [formData, setFormData] = useState({
