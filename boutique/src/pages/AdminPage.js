@@ -77,7 +77,7 @@ const AdminPage = () => {
                   </li>
                 </ul>
               </li>
-              <li className="mb-6">
+              {/* <li className="mb-6">
                 <Link
                   to="manage-materials"
                   className="flex items-center text-indigo-600 hover:bg-indigo-100 p-3 rounded-lg transition-colors duration-300 w-full text-left"
@@ -85,8 +85,8 @@ const AdminPage = () => {
                   <FaPalette className="text-indigo-500" />
                   <span className="ml-4 font-semibold">Manage Materials</span>
                 </Link>
-              </li>
-              <li className="mb-6">
+              </li> */}
+              {/* <li className="mb-6">
                 <Link
                   to="business-reports"
                   className="flex items-center text-purple-600 hover:bg-purple-100 p-3 rounded-lg transition-colors duration-300 w-full text-left"
@@ -94,8 +94,8 @@ const AdminPage = () => {
                   <FaChartBar className="text-purple-500" />
                   <span className="ml-4 font-semibold">Business Reports</span>
                 </Link>
-              </li>
-              <li className="mb-6">
+              </li> */}
+              {/* <li className="mb-6">
                 <Link
                   to="settings"
                   className="flex items-center text-red-600 hover:bg-red-100 p-3 rounded-lg transition-colors duration-300 w-full text-left"
@@ -103,7 +103,7 @@ const AdminPage = () => {
                   <FaCogs className="text-red-500" />
                   <span className="ml-4 font-semibold">Settings</span>
                 </Link>
-              </li>
+              </li> */}
               <li className="mb-6">
                 <Link
                   to="customer-support"

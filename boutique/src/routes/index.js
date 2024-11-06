@@ -26,6 +26,7 @@ import ProductDetails from '../pages/ProductDetails';
 import AboutUs from '../pages/AboutUs';
 import ProductInfo from '../pages/ProductInfo';
 import CustomizationForm from '../pages/CustomizationForm';
+import Checkout from '../pages/Checkout';
 const router = createBrowserRouter([
     {
         path: "/",
@@ -50,6 +51,7 @@ const router = createBrowserRouter([
             { path: "about-us", element:<AboutUs />},
             { path: "product-info/:id", element:<ProductInfo />},
             { path: "customize/:id", element:<CustomizationForm />},
+            { path: "checkout", element:<Checkout />},
             // Admin routes
             {
                 path: "admin",

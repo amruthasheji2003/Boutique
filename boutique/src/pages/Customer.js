@@ -5,7 +5,7 @@ import axios from 'axios';
 import logo from '../assets/logo.png'; // Update this path to your logo's location
 import backgroundImage from '../assets/customer.jpg'; 
 
-const API_URL = 'http://localhost:8080';
+const API_URL = 'https://boutique-backend-j6re.onrender.com';
 
 const Customer = () => {
   const navigate = useNavigate();
@@ -35,7 +35,7 @@ const Customer = () => {
         setError(null);
       } catch (error) {
         console.error('Error fetching user profile:', error);
-        setError('Failed to load user profile');
+        // setError('Failed to load user profile');
         if (error.response && error.response.status === 401) {
           localStorage.removeItem('token');
           navigate('/login');

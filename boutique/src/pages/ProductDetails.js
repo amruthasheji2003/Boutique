@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import axios from 'axios';
 
-const API_URL = 'http://localhost:8080';
+const API_URL = 'https://boutique-backend-j6re.onrender.com';
 
 const ProductDetails = () => {
   const [product, setProduct] = useState(null);

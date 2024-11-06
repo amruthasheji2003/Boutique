@@ -3,7 +3,7 @@ import axios from 'axios';
 import { useNavigate, Link } from 'react-router-dom';
 import logo from '../assets/logo.png';
 
-const API_BASE_URL = 'http://localhost:8080';
+const API_BASE_URL = 'https://boutique-backend-j6re.onrender.com';
 
 function Cart() {
   const [cart, setCart] = useState(null);
