@@ -52,7 +52,8 @@ const Home = () => {
       <header className='h-20 shadow-md bg-white fixed w-full z-40'>
         <div className='container mx-auto flex items-center justify-between px-4 h-full'>
           {/* Logo Section */}
-          <div className='flex items-center'>
+          <div className='flex itemf
+          s-center'>
             <Link to="/">
               <img src={logo} alt="Tailor's Touch Logo" className="h-12 mr-4" /> {/* Logo added */}
             </Link>
@@ -84,6 +85,10 @@ const Home = () => {
             <Link to="/contact-us" className='text-gray-700 hover:text-blue-500 transition-colors duration-300'>Contact Us</Link>
             <Link to="/login" className='bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600 transition-colors duration-300'>
               Login
+            </Link>
+            {/* Become a Vendor Link */}
+            <Link to="/vendor-register" className='bg-yellow-500 text-white px-4 py-2 rounded-md hover:bg-yellow-600 transition-colors duration-300'>
+              Become a Vendor
             </Link>
           </nav>
         </div>

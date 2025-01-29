@@ -8,7 +8,7 @@ const ManageCategories = () => {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await fetch('https://boutique-backend-j6re.onrender.com/api/category'); // Replace with your API endpoint
+        const response = await fetch('http://localhost:8080/api/category'); // Replace with your API endpoint
         if (!response.ok) {
           throw new Error('Failed to fetch categories');
         }
@@ -29,7 +29,7 @@ const ManageCategories = () => {
     if (!newCategory) return;
 
     try {
-      const response = await fetch('https://boutique-backend-j6re.onrender.com/api/category', { // Corrected endpoint
+      const response = await fetch('http://localhost:8080/api/category', { // Corrected endpoint
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

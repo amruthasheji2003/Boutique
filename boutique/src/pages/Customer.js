@@ -5,7 +5,7 @@ import axios from 'axios';
 import logo from '../assets/logo.png'; // Update this path to your logo's location
 import backgroundImage from '../assets/customer.jpg'; 
 
-const API_URL = 'https://boutique-backend-j6re.onrender.com';
+const API_URL = 'http://localhost:8080';
 
 const Customer = () => {
   const navigate = useNavigate();

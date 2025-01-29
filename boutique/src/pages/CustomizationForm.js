@@ -3,7 +3,7 @@ import axios from 'axios';
 import { useParams } from 'react-router-dom';
 
 // Set the base URL for Axios to point to your backend API
-axios.defaults.baseURL = 'https://boutique-backend-j6re.onrender.com'; // Adjust the port as necessary
+axios.defaults.baseURL = 'http://localhost:8080'; // Adjust the port as necessary
 
 const CustomizationForm = () => {
   const { id } = useParams(); // Get the product ID from the URL

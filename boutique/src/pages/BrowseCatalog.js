@@ -3,7 +3,7 @@ import axios from 'axios';
 import { useNavigate, Link } from 'react-router-dom';
 import logo from '../assets/logo.png';
 
-const API_URL = 'https://boutique-backend-j6re.onrender.com';
+const API_URL = 'http://localhost:8080';
 
 const formatPrice = (price) => {
   return `₹${new Intl.NumberFormat('en-IN', {

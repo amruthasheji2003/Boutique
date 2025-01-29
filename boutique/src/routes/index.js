@@ -27,6 +27,9 @@ import AboutUs from '../pages/AboutUs';
 import ProductInfo from '../pages/ProductInfo';
 import CustomizationForm from '../pages/CustomizationForm';
 import Checkout from '../pages/Checkout';
+import VendorRegistration from '../pages/VendorRegistration';
+import VendorLogin from '../pages/VendorLogin';
+import VendorDashboard from '../pages/VendorDashboard';
 const router = createBrowserRouter([
     {
         path: "/",
@@ -52,6 +55,10 @@ const router = createBrowserRouter([
             { path: "product-info/:id", element:<ProductInfo />},
             { path: "customize/:id", element:<CustomizationForm />},
             { path: "checkout", element:<Checkout />},
+            { path: "vendor-register", element:<VendorRegistration />},
+            { path: "vendor-login", element:<VendorLogin />},
+            { path: "vendor-page", element:<VendorDashboard/>},
+           
             // Admin routes
             {
                 path: "admin",

@@ -32,7 +32,7 @@ const Login = () => {
     if (!valid) return;
 
     try {
-      const adminResponse = await fetch('https://boutique-backend-j6re.onrender.com/api/admin/login', {
+      const adminResponse = await fetch('http://localhost:8080/api/admin/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -51,7 +51,7 @@ const Login = () => {
         return;
       }
 
-      const userResponse = await fetch('https://boutique-backend-j6re.onrender.com/api/auth/login', {
+      const userResponse = await fetch('http://localhost:8080/api/auth/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

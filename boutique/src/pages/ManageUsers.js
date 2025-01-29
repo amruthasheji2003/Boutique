@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
-const API_URL = 'https://boutique-backend-j6re.onrender.com'; // Adjust this to match your backend URL
+const API_URL = 'http://localhost:8080'; // Adjust this to match your backend URL
 
 const ManageUsers = () => {
     const [searchTerm, setSearchTerm] = useState('');

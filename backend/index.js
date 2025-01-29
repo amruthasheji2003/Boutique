@@ -16,6 +16,8 @@ const cartRoutes = require('./routes/cartRoutes');
 const wishlistRoutes = require('./routes/wishlistRoutes');
 const measurementRoutes = require('./routes/measurementRoutes');
 const customizationRoutes = require('./routes/customizationRoutes');
+const vendorRoutes = require('./routes/vendorRoutes');
+const materialRoutes = require('./routes/materialRoutes');
 
 // Initialize Express app
 const app = express();
@@ -27,7 +29,7 @@ const PORT = process.env.PORT || 8080;
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/yourdbname';
 
 // Middleware for Cross-Origin Resource Sharing (CORS)
-app.use(cors({ origin: 'https://boutique-80by.onrender.com' })); // Allow requests from the frontend (React)
+app.use(cors({ origin: '*' })); // Allow requests from the frontend (React)
 
 // Middleware to parse JSON and URL-encoded data
 app.use(express.json());
@@ -51,6 +53,9 @@ app.use('/api/cart', cartRoutes);
 app.use('/api/wishlist', wishlistRoutes);
 app.use('/api/measurements',measurementRoutes);
 app.use('/api/customizations',customizationRoutes);
+app.use('/api/vendors', vendorRoutes);
+app.use('/api/materials',materialRoutes);
+
 
 
 

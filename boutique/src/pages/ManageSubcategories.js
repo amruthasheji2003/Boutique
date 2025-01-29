@@ -105,7 +105,7 @@ const ManageSubcategories = () => {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await axios.get('https://boutique-backend-j6re.onrender.com/api/categories');
+        const response = await axios.get('http://localhost:8080/api/categories');
         setCategories(response.data); // Assume response.data is an array of category objects
         if (response.data.length > 0) {
           setSelectedCategory(response.data[0]._id); // Set the first category as selected
@@ -128,7 +128,7 @@ const ManageSubcategories = () => {
       }
   
       try {
-        const response = await axios.get(`https://boutique-backend-j6re.onrender.com/api/subcategories/${category}`);
+        const response = await axios.get(`http://localhost:8080/api/subcategories/${category}`);
   
         console.log('Subcategories response:', response.data); // Log the response data
   
@@ -160,7 +160,7 @@ const ManageSubcategories = () => {
     if (newSubcategory.trim() === '') return;
 
     try {
-      const response = await axios.post('https://boutique-backend-j6re.onrender.com/api/subcategories', {
+      const response = await axios.post('http://localhost:8080/api/subcategories', {
         name: newSubcategory,
         category: selectedCategory,
       });
@@ -183,7 +183,7 @@ const ManageSubcategories = () => {
   // Delete Subcategory
   const handleDeleteSubcategory = async (subcategoryId) => {
     try {
-      await axios.delete(`https://boutique-backend-j6re.onrender.com/api/subcategories/${subcategoryId}`);
+      await axios.delete(`http://localhost:8080/api/subcategories/${subcategoryId}`);
       
       setSubcategories((prevState) => ({
         ...prevState,
