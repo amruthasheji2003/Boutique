@@ -3,6 +3,7 @@ import React from 'react';
 import './App.css'; // Import global CSS
 import { Outlet } from 'react-router-dom'; // Use Outlet for nested routes
 import Footer from './components/Footer';
+import WhatsAppButton from './components/WhatsAppButton';
 // import Header from './components/Header'; // Uncomment if you have a Header component
 
 function App() {
@@ -13,6 +14,7 @@ function App() {
         <Outlet /> {/* Render child routes here */}
       </main>
       <Footer />
+      <WhatsAppButton /> {/* Include the WhatsApp button here */}
     </>
   );
 }
