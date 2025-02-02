@@ -1,3 +1,4 @@
+// src/routes/index.js
 import { createBrowserRouter } from 'react-router-dom';
 import App from '../App';
 import Home from '../pages/Home';
@@ -30,6 +31,7 @@ import Checkout from '../pages/Checkout';
 import VendorRegistration from '../pages/VendorRegistration';
 import VendorLogin from '../pages/VendorLogin';
 import VendorDashboard from '../pages/VendorDashboard';
+
 const router = createBrowserRouter([
     {
         path: "/",
@@ -50,14 +52,14 @@ const router = createBrowserRouter([
             { path: "cart", element: <Cart /> },
             { path: "forgot-password", element: <ForgotPassword /> },
             { path: "manage-materials", element: <MaterialManagement /> },
-            { path: "manage-products/:id", element:<ManageProducts />},
-            { path: "about-us", element:<AboutUs />},
-            { path: "product-info/:id", element:<ProductInfo />},
-            { path: "customize/:id", element:<CustomizationForm />},
-            { path: "checkout", element:<Checkout />},
-            { path: "vendor-register", element:<VendorRegistration />},
-            { path: "vendor-login", element:<VendorLogin />},
-            { path: "vendor-page", element:<VendorDashboard/>},
+            { path: "manage-products/:id", element: <ManageProducts /> },
+            { path: "about-us", element: <AboutUs /> },
+            { path: "product-info/:id", element: <ProductInfo /> },
+            { path: "customize/:id", element: <CustomizationForm /> },
+            { path: "checkout", element: <Checkout /> },
+            { path: "vendor-register", element: <VendorRegistration /> },
+            { path: "vendor-login", element: <VendorLogin /> },
+            { path: "vendor-page", element: <VendorDashboard /> },
            
             // Admin routes
             {
@@ -69,10 +71,8 @@ const router = createBrowserRouter([
                     { path: "manage-categories", element: <ManageCategories /> },
                     { path: "manage-subcategories", element: <ManageSubcategories /> },
                     { path: "view-products", element: <ViewProducts /> },
-                    { path: " manage-products/${id}", element: <ManageProducts/>},
                     { path: "edit-product/:id", element: <EditProduct /> },
                     { path: "product-details/:id", element: <ProductDetails /> },
-                    
                 ]
             },
             { path: "product/:id", element: <ProductDetails /> }

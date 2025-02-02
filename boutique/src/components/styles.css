@@ -4,11 +4,11 @@
     bottom: 5px; /* Distance from the bottom */
     right: 20px; /* Distance from the right */
     background-color: #25D366; /* WhatsApp green */
-    border-radius: 50%; /* Circular button */
+    border-radius: 45%; /* Circular button */
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3); /* Shadow for depth */
     transition: background-color 0.3s; /* Smooth background change */
-    width: 60px; /* Width of the icon */
-    height: 60px; /* Height of the icon */
+    width: 50px; /* Width of the icon */
+    height: 52px; /* Height of the icon */
     display: flex;
     align-items: center;
     justify-content: center;

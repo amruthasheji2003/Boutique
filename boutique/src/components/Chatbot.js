@@ -53,7 +53,7 @@ function Chatbot() {
   return (
     <>
       <div
-        className="fixed bottom-14 right-6 bg-red-800 text-white rounded-full p-4 shadow-lg cursor-pointer hover:bg-red-600"
+        className="fixed bottom-14 right-5 bg-red-800 text-white rounded-full p-4 shadow-lg cursor-pointer hover:bg-red-600"
         onClick={toggleChatbot}
       >
         💬

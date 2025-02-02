@@ -10,13 +10,21 @@ const VendorDashboard = () => {
     price: '',
     stock: '',
     image: null,
-    quantity: '', // Added quantity
-    unit: '',     // Added unit
+    quantity: '',
+    unit: '',
   });
-  const [error, setError] = useState('');
+  const [error, setError] = useState({
+    category: '',
+    description: '',
+    price: '',
+    stock: '',
+    quantity: '',
+    unit: '',
+    image: '',
+    general: '',
+  });
   const [successMessage, setSuccessMessage] = useState('');
 
-  // Add this array of material categories
   const materialCategories = [
     'Fabric',
     'Laces',
@@ -30,6 +38,11 @@ const VendorDashboard = () => {
     'Interfacing'
   ];
 
+  const unitOptions = [
+    { value: 'meters', label: 'Meters' },
+    { value: 'pieces', label: 'Pieces' },
+  ];
+
   useEffect(() => {
     fetchMaterials();
   }, []);
@@ -40,21 +53,78 @@ const VendorDashboard = () => {
       setMaterials(response.data);
     } catch (error) {
       console.error('Error fetching materials:', error);
-      setError('Failed to fetch materials.');
+      setError((prev) => ({ ...prev, general: 'Failed to fetch materials.' }));
     }
   };
 
   const handleMaterialChange = (e) => {
     const { name, value } = e.target;
     setNewMaterial((prev) => ({ ...prev, [name]: value }));
+
+    // Immediate validation
+    if (name === 'price' || name === 'quantity' || name === 'stock') {
+      if (value <= 0) {
+        setError((prev) => ({ ...prev, [name]: `${name.charAt(0).toUpperCase() + name.slice(1)} must be greater than zero.` }));
+      } else {
+        setError((prev) => ({ ...prev, [name]: '' })); // Clear error if valid
+      }
+    } else if (!value) {
+      setError((prev) => ({ ...prev, [name]: 'This field is required.' }));
+    } else {
+      setError((prev) => ({ ...prev, [name]: '' })); // Clear error if valid
+    }
   };
 
   const handleImageChange = (e) => {
-    setNewMaterial((prev) => ({ ...prev, image: e.target.files[0] }));
+    const file = e.target.files[0];
+    if (file && !file.type.startsWith('image/')) {
+      setError((prev) => ({ ...prev, image: 'Please upload a valid image file.' }));
+      setNewMaterial((prev) => ({ ...prev, image: null })); // Reset image if invalid
+    } else {
+      setError((prev) => ({ ...prev, image: '' })); // Clear error if valid
+      setNewMaterial((prev) => ({ ...prev, image: file }));
+    }
+  };
+
+  const validateFields = () => {
+    let valid = true;
+    const newError = { ...error };
+
+    if (!newMaterial.category) {
+      newError.category = 'This field is required.';
+      valid = false;
+    }
+    if (!newMaterial.description) {
+      newError.description = 'This field is required.';
+      valid = false;
+    }
+    if (newMaterial.price <= 0) {
+      newError.price = 'Price must be greater than zero.';
+      valid = false;
+    }
+    if (newMaterial.stock <= 0) {
+      newError.stock = 'Stock must be greater than zero.';
+      valid = false;
+    }
+    if (newMaterial.quantity <= 0) {
+      newError.quantity = 'Quantity must be greater than zero.';
+      valid = false;
+    }
+    if (!newMaterial.unit) {
+      newError.unit = 'This field is required.';
+      valid = false;
+    }
+
+    setError(newError); // Update error state
+    return valid;
   };
 
   const handleAddMaterial = async (e) => {
     e.preventDefault();
+    if (!validateFields()) {
+      return; // Stop submission if validation fails
+    }
+
     const formData = new FormData();
     Object.entries(newMaterial).forEach(([key, value]) => {
       formData.append(key, value);
@@ -68,26 +138,26 @@ const VendorDashboard = () => {
       fetchMaterials(); // Refresh materials list
       setNewMaterial({ category: '', description: '', price: '', stock: '', image: null, quantity: '', unit: '' }); // Reset state
     } catch (error) {
-      setError('Error adding material');
+      setError((prev) => ({ ...prev, general: 'Error adding material' }));
     }
   };
 
   const handleDeleteMaterial = async (id) => {
     if (!id) {
-      console.error('No ID provided for deletion'); // Log if ID is undefined
-      setError('No ID provided for deletion');
+      console.error('No ID provided for deletion');
+      setError((prev) => ({ ...prev, general: 'No ID provided for deletion' }));
       return;
     }
 
-    console.log('Deleting material with ID:', id); // Log the ID
+    console.log('Deleting material with ID:', id);
     try {
-      const response = await axios.delete(`http://localhost:8080/api/materials/${id}`); // Corrected template literal
-      console.log('Delete response:', response.data); // Log the response
+      const response = await axios.delete(`http://localhost:8080/api/materials/${id}`);
+      console.log('Delete response:', response.data);
       fetchMaterials(); // Refresh materials list
       setSuccessMessage('Material deleted successfully!');
     } catch (error) {
-      console.error('Error response:', error.response); // Log the error response
-      setError('Error deleting material');
+      console.error('Error response:', error.response);
+      setError((prev) => ({ ...prev, general: 'Error deleting material' }));
     }
   };
 
@@ -110,6 +180,8 @@ const VendorDashboard = () => {
             </option>
           ))}
         </select>
+        {error.category && <p style={styles.error}>{error.category}</p>}
+
         <textarea
           name="description"
           placeholder="Description"
@@ -118,6 +190,8 @@ const VendorDashboard = () => {
           required
           style={styles.textarea}
         />
+        {error.description && <p style={styles.error}>{error.description}</p>}
+
         <input
           type="number"
           name="price"
@@ -127,6 +201,8 @@ const VendorDashboard = () => {
           required
           style={styles.input}
         />
+        {error.price && <p style={styles.error}>{error.price}</p>}
+
         <input
           type="number"
           name="stock"
@@ -136,6 +212,8 @@ const VendorDashboard = () => {
           required
           style={styles.input}
         />
+        {error.stock && <p style={styles.error}>{error.stock}</p>}
+
         <input
           type="number"
           name="quantity"
@@ -145,23 +223,35 @@ const VendorDashboard = () => {
           required
           style={styles.input}
         />
-        <input
-          type="text"
+        {error.quantity && <p style={styles.error}>{error.quantity}</p>}
+
+        <label htmlFor="unit">Select Unit:</label>
+        <select
           name="unit"
-          placeholder="Unit (e.g., meters, pieces)"
           value={newMaterial.unit}
           onChange={handleMaterialChange}
           required
           style={styles.input}
-        />
+        >
+          <option value="">Select Unit</option>
+          {unitOptions.map((option) => (
+            <option key={option.value} value={option.value}>
+              {option.label}
+            </option>
+          ))}
+        </select>
+        {error.unit && <p style={styles.error}>{error.unit}</p>}
+
         <input
           type="file"
           onChange={handleImageChange}
           required
           style={styles.fileInput}
         />
+        {error.image && <p style={styles.error}>{error.image}</p>}
+
         <button type="submit" style={styles.button}>Add Material</button>
-        {error && <p style={styles.error}>{error}</p>}
+        {error.general && <p style={styles.error}>{error.general}</p>}
         {successMessage && <p style={styles.success}>{successMessage}</p>}
       </form>
 
@@ -172,16 +262,13 @@ const VendorDashboard = () => {
             <div style={styles.materialDetails}>
               <strong>Category:</strong> {material.category} <br />
               <strong>Description:</strong> {material.description} <br />
-              <strong>Price:</strong> ${material.price} <br />
+              <strong>Price:</strong> Rs.{material.price} <br />
               <strong>Stock:</strong> {material.stock} <br />
               <strong>Quantity:</strong> {material.quantity} <br />
               <strong>Unit:</strong> {material.unit} <br />
-              <img src={material.image} alt={material.description} style={styles.materialImage} />
+              <img src={`http://localhost:8080/uploads/${material.image}`} alt={material.description} style={styles.materialImage} />
             </div>
-            <button onClick={() => {
-              console.log('Material ID clicked for deletion:', material._id); // Log the ID of the material being deleted
-              handleDeleteMaterial(material._id); // Ensure the correct ID is passed
-            }} style={styles.deleteButton}>Delete</button>
+            <button onClick={() => handleDeleteMaterial(material._id)} style={styles.deleteButton}>Delete</button>
           </li>
         ))}
       </ul>

@@ -13,10 +13,44 @@ const VendorLogin = () => {
   const [successMessage, setSuccessMessage] = useState('');
   const navigate = useNavigate();
 
+  const validateEmail = (email) => {
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailPattern.test(email);
+  };
+
+  const validatePassword = (password) => {
+    return password.length >= 6; // Example: minimum password length
+  };
+
+  const handleChangeEmail = (e) => {
+    const value = e.target.value;
+    setEmail(value);
+    if (!validateEmail(value)) {
+      setError('Please enter a valid email address.');
+    } else {
+      setError(''); // Clear error if validation passes
+    }
+  };
+
+  const handleChangePassword = (e) => {
+    const value = e.target.value;
+    setPassword(value);
+    if (!validatePassword(value)) {
+      setError('Password must be at least 6 characters long.');
+    } else {
+      setError(''); // Clear error if validation passes
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
     setSuccessMessage('');
+
+    if (!validateEmail(email) || !validatePassword(password)) {
+      return; // Stop submission if validation fails
+    }
+
     try {
       const response = await axios.post('http://localhost:8080/api/vendors/login', { email, password });
       setSuccessMessage(response.data.message);
@@ -50,7 +84,7 @@ const VendorLogin = () => {
             <input
               type="email"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={handleChangeEmail}
               style={styles.input}
               required
             />
@@ -61,7 +95,7 @@ const VendorLogin = () => {
               <input
                 type={showPassword ? 'text' : 'password'}
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={handleChangePassword}
                 style={styles.input}
                 required
               />

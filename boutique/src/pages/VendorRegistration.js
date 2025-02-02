@@ -15,7 +15,15 @@ const VendorRegistration = () => {
     phoneNumber: '',
     termsAccepted: false,
   });
-  const [error, setError] = useState('');
+  const [errors, setErrors] = useState({
+    organizationName: '',
+    email: '',
+    password: '',
+    confirmPassword: '',
+    gstin: '',
+    phoneNumber: '',
+    termsAccepted: '',
+  });
   const [successMessage, setSuccessMessage] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -27,7 +35,7 @@ const VendorRegistration = () => {
       ...prevState,
       [name]: value,
     }));
-    setError('');
+    validateField(name, value); // Validate the field immediately
     setSuccessMessage('');
   };
 
@@ -36,26 +44,109 @@ const VendorRegistration = () => {
       ...prevState,
       termsAccepted: !prevState.termsAccepted,
     }));
+    setErrors((prevErrors) => ({
+      ...prevErrors,
+      termsAccepted: '', // Clear the error for terms accepted
+    }));
   };
-  
- 
+
+  const validateField = (name, value) => {
+    let validationErrors = { ...errors };
+
+    switch (name) {
+      case 'organizationName':
+        validationErrors.organizationName = value ? '' : 'Organization Name is required.';
+        break;
+      case 'email':
+        validationErrors.email = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value) ? '' : 'Please enter a valid email address.';
+        break;
+      case 'password':
+        validationErrors.password = (value.length >= 8 && /(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])/.test(value))
+          ? ''
+          : 'Password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, one number, and one special character.';
+        break;
+      case 'confirmPassword':
+        validationErrors.confirmPassword = value === formData.password ? '' : 'Passwords do not match.';
+        break;
+      case 'gstin':
+        validationErrors.gstin = /^[0-9]{2}[A-Z]{4}[0-9]{4}[Z][A-Z0-9]{1}$/.test(value) ? '' : 'Please enter a valid GSTIN.';
+        break;
+      case 'phoneNumber':
+        validationErrors.phoneNumber = /^\d{10}$/.test(value) ? '' : 'Phone number must be 10 digits.';
+        break;
+      default:
+        break;
+    }
+
+    setErrors(validationErrors);
+  };
+
+  const validateForm = () => {
+    const { organizationName, email, password, confirmPassword, gstin, phoneNumber, termsAccepted } = formData;
+    let validationErrors = {
+      organizationName: '',
+      email: '',
+      password: '',
+      confirmPassword: '',
+      gstin: '',
+      phoneNumber: '',
+      termsAccepted: '',
+    };
+
+    // Validate all fields
+    if (!organizationName) {
+      validationErrors.organizationName = 'Organization Name is required.';
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      validationErrors.email = 'Please enter a valid email address.';
+    }
+    if (password.length < 8 || !/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}/.test(password)) {
+      validationErrors.password = 'Password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, one number, and one special character.';
+    }
+    if (password !== confirmPassword) {
+      validationErrors.confirmPassword = 'Passwords do not match.';
+    }
+    if (!/^[0-9]{2}[A-Z]{4}[0-9]{4}[Z][A-Z0-9]{1}$/.test(gstin)) {
+      validationErrors.gstin = 'Please enter a valid GSTIN.';
+    }
+    if (!/^\d{10}$/.test(phoneNumber)) {
+      validationErrors.phoneNumber = 'Phone number must be 10 digits.';
+    }
+    if (!termsAccepted) {
+      validationErrors.termsAccepted = 'You must accept the terms and conditions.';
+    }
+
+    setErrors(validationErrors);
+    return Object.values(validationErrors).every((error) => error === '');
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
     setSuccessMessage('');
+
+    if (!validateForm()) {
+      return; // Stop submission if validation fails
+    }
+
     try {
       const response = await axios.post('http://localhost:8080/api/vendors/register', formData);
       setSuccessMessage(response.data.message);
       setTimeout(() => navigate('/vendor-login'), 3000); // Redirect to login after 3 seconds
     } catch (error) {
       if (error.response) {
-        setError(error.response.data.message || 'Registration failed');
+        setErrors((prevErrors) => ({
+          ...prevErrors,
+          general: error.response.data.message || 'Registration failed',
+        }));
       } else {
-        setError('Registration failed. Please try again.');
+        setErrors((prevErrors) => ({
+          ...prevErrors,
+          general: 'Registration failed. Please try again.',
+        }));
       }
     }
   };
+
   const handleLogin = () => {
     navigate('/vendor-login'); // Change this path to your actual login route
   };
@@ -95,6 +186,7 @@ const VendorRegistration = () => {
                   style={styles.input}
                   required
                 />
+                {errors.organizationName && <p style={styles.error}>{errors.organizationName}</p>}
               </label>
               <label style={styles.label}>
                 Email
@@ -106,6 +198,7 @@ const VendorRegistration = () => {
                   style={styles.input}
                   required
                 />
+                {errors.email && <p style={styles.error}>{errors.email}</p>}
               </label>
               <label style={styles.label}>
                 Password
@@ -122,6 +215,7 @@ const VendorRegistration = () => {
                     <FontAwesomeIcon icon={showPassword ? faEye : faEyeSlash} />
                   </span>
                 </div>
+                {errors.password && <p style={styles.error}>{errors.password}</p>}
               </label>
               <label style={styles.label}>
                 Confirm Password
@@ -138,6 +232,7 @@ const VendorRegistration = () => {
                     <FontAwesomeIcon icon={showConfirmPassword ? faEye : faEyeSlash} />
                   </span>
                 </div>
+                {errors.confirmPassword && <p style={styles.error}>{errors.confirmPassword}</p>}
               </label>
               <label style={styles.label}>
                 GSTIN
@@ -149,6 +244,7 @@ const VendorRegistration = () => {
                   style={styles.input}
                   required
                 />
+                {errors.gstin && <p style={styles.error}>{errors.gstin}</p>}
               </label>
             </div>
             <div style={styles.rightColumn}>
@@ -162,6 +258,7 @@ const VendorRegistration = () => {
                   style={styles.input}
                   required
                 />
+                {errors.phoneNumber && <p style={styles.error}>{errors.phoneNumber}</p>}
               </label>
               <label style={styles.checkboxLabel}>
                 <input
@@ -172,10 +269,11 @@ const VendorRegistration = () => {
                   required
                 />
                 I accept the terms and conditions
+                {errors.termsAccepted && <p style={styles.error}>{errors.termsAccepted}</p>}
               </label>
             </div>
           </div>
-          {error && <p style={styles.error}>{error}</p>}
+          {errors.general && <p style={styles.error}>{errors.general}</p>}
           {successMessage && <p style={styles.success}>{successMessage}</p>}
           <button type="submit" style={styles.button}>Register</button>
         </form>
@@ -275,6 +373,7 @@ const styles = {
   error: {
     color: 'red',
     marginBottom: '10px',
+    fontSize: '12px', // Smaller font size for error messages
   },
   success: {
     color: 'green',
