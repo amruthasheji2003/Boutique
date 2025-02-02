@@ -1,7 +1,7 @@
 /* boutique/src/components/styles.css */
 .whatsapp-icon {
     position: fixed; /* Fixed position to stay on screen */
-    bottom: 20px; /* Distance from the bottom */
+    bottom: 5px; /* Distance from the bottom */
     right: 20px; /* Distance from the right */
     background-color: #25D366; /* WhatsApp green */
     border-radius: 50%; /* Circular button */
@@ -18,9 +18,11 @@
 
 .whatsapp-button {
     color: white; /* Icon color */
-    font-size: 28px; /* Icon size */
+    font-size: 25px; /* Icon size */
 }
 
 .whatsapp-icon:hover {
     background-color: #128C7E; /* Darker green on hover */
 }
+
+/* Chatbot button styles */

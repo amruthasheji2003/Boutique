@@ -18,6 +18,7 @@ const measurementRoutes = require('./routes/measurementRoutes');
 const customizationRoutes = require('./routes/customizationRoutes');
 const vendorRoutes = require('./routes/vendorRoutes');
 const materialRoutes = require('./routes/materialRoutes');
+const chatbotRoutes = require('./routes/chatbotRoutes');
 
 // Initialize Express app
 const app = express();
@@ -55,6 +56,7 @@ app.use('/api/measurements',measurementRoutes);
 app.use('/api/customizations',customizationRoutes);
 app.use('/api/vendors', vendorRoutes);
 app.use('/api/materials',materialRoutes);
+app.use('/api', chatbotRoutes);
 
 
 
