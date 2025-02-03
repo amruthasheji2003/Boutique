@@ -30,8 +30,9 @@ const PORT = process.env.PORT || 8080;
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/yourdbname';
 
 // Middleware for Cross-Origin Resource Sharing (CORS)
-app.use(cors({ origin: '*' })); // Allow requests from the frontend (React)
-
+app.use(cors({
+  origin: 'http://localhost:3000', // Replace with your frontend URL
+}));
 // Middleware to parse JSON and URL-encoded data
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));

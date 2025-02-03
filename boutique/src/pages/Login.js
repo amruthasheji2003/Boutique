@@ -67,8 +67,9 @@ const Login = () => {
         localStorage.setItem('name', userData.user.firstName); 
         setSuccessMessage('User login successful! Redirecting...');
         setTimeout(() => {
-          navigate('/Customer');
+          navigate('/browse-catalog');
         }, 2000);
+
       } else {
         setEmailError(userData.message || 'Login failed');
       }

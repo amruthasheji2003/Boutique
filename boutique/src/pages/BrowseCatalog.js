@@ -27,6 +27,8 @@ const BrowseCatalog = () => {
   const [wishlistMessage, setWishlistMessage] = useState(null);
   const [cartItems, setCartItems] = useState([]); // Add this line
   const [wishlistItems, setWishlistItems] = useState([]); // Add this line
+  const [userName, setUserName] = useState(''); // State for user name
+
 
   const navigate = useNavigate();
 
@@ -35,7 +37,10 @@ const BrowseCatalog = () => {
     fetchCategories();
     fetchCart();
     fetchWishlist();
+    const name = localStorage.getItem('name');
+    setUserName(name); // Set the user name
   }, []);
+ 
 
 
   useEffect(() => {
@@ -196,6 +201,12 @@ const BrowseCatalog = () => {
       setCartMessage(null);
     }, 3000);
   };
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('name'); // Clear the user name as well
+    navigate('/login'); // Redirect to login page after logout
+  };
+
 
   const handleCategoryChange = (e) => {
     setSelectedCategory(e.target.value);
@@ -266,6 +277,8 @@ const BrowseCatalog = () => {
           <Link to="/">
             <img src={logo} alt="Tailor's Touch Logo" className="h-12 mr-2" />
           </Link>
+            
+          
           <Link to="/" className='text-green-600 text-3xl font-bold hover:text-pink-500 transition-colors duration-300'>
             Tailor's Touch Boutique
           </Link>
@@ -279,6 +292,7 @@ const BrowseCatalog = () => {
             />
           </div>
           <nav className="flex items-center space-x-6">
+          <p className="text-gray-700">Welcome, {userName}!</p> {/* Display user name */}
             <Link to="/" className='text-gray-700 hover:text-pink-500 transition-colors duration-300'>Home</Link>
             <Link to="/wishlist" className='text-gray-700 hover:text-pink-500 transition-colors duration-300 relative'>
               <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -308,10 +322,19 @@ const BrowseCatalog = () => {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
             </svg>
           </button>
+          <button 
+              onClick={handleLogout}
+              className="text-gray-700 hover:text-pink-500 transition-colors duration-300"
+            >
+              Logout
+            </button>
           </nav>
+          
         </div>
         
+        
       </header>
+      
 
       <main className="flex-grow container mx-auto px-4 pt-20 pb-8"> 
         <div className="mb-6 flex flex-wrap items-center">
@@ -398,6 +421,7 @@ const BrowseCatalog = () => {
                       >
                         {isInCart ? 'In Cart' : 'Add to Cart'}
                       </button>
+                      
                     </div>
                   </div>
                 </div>

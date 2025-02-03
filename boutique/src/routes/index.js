@@ -3,7 +3,6 @@ import { createBrowserRouter } from 'react-router-dom';
 import App from '../App';
 import Home from '../pages/Home';
 import Login from '../pages/Login';
-import Customer from '../pages/Customer';
 import Registration from '../pages/Registration';
 import FeaturedProducts from '../pages/FeaturedProducts';
 import ContactUs from '../pages/ContactUs';
@@ -39,7 +38,6 @@ const router = createBrowserRouter([
         children: [
             { path: "/", element: <Home /> },
             { path: "login", element: <Login /> },
-            { path: "customer", element: <Customer /> },
             { path: "registration", element: <Registration /> },
             { path: "profile", element: <Profile /> },
             { path: "featured-products", element: <FeaturedProducts /> },

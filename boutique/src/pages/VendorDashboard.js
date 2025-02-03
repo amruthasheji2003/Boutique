@@ -167,6 +167,7 @@ const VendorDashboard = () => {
       <form onSubmit={handleAddMaterial} style={styles.form}>
         <label htmlFor="category">Select Material Category:</label>
         <select
+          id="category" // Added id
           name="category"
           value={newMaterial.category}
           onChange={handleMaterialChange}
@@ -182,7 +183,9 @@ const VendorDashboard = () => {
         </select>
         {error.category && <p style={styles.error}>{error.category}</p>}
 
+        <label htmlFor="description">Description:</label>
         <textarea
+          id="description" // Added id
           name="description"
           placeholder="Description"
           value={newMaterial.description}
@@ -192,7 +195,9 @@ const VendorDashboard = () => {
         />
         {error.description && <p style={styles.error}>{error.description}</p>}
 
+        <label htmlFor="price">Price:</label>
         <input
+          id="price" // Added id
           type="number"
           name="price"
           placeholder="Price"
@@ -203,7 +208,9 @@ const VendorDashboard = () => {
         />
         {error.price && <p style={styles.error}>{error.price}</p>}
 
+        <label htmlFor="stock">Stock Availability:</label>
         <input
+          id="stock" // Added id
           type="number"
           name="stock"
           placeholder="Stock Availability"
@@ -214,7 +221,9 @@ const VendorDashboard = () => {
         />
         {error.stock && <p style={styles.error}>{error.stock}</p>}
 
+        <label htmlFor="quantity">Quantity:</label>
         <input
+          id="quantity" // Added id
           type="number"
           name="quantity"
           placeholder="Quantity"
@@ -227,6 +236,7 @@ const VendorDashboard = () => {
 
         <label htmlFor="unit">Select Unit:</label>
         <select
+          id="unit" // Added id
           name="unit"
           value={newMaterial.unit}
           onChange={handleMaterialChange}
@@ -242,7 +252,9 @@ const VendorDashboard = () => {
         </select>
         {error.unit && <p style={styles.error}>{error.unit}</p>}
 
+        <label htmlFor="image">Upload Image:</label>
         <input
+          id="image" // Added id
           type="file"
           onChange={handleImageChange}
           required
@@ -266,7 +278,15 @@ const VendorDashboard = () => {
               <strong>Stock:</strong> {material.stock} <br />
               <strong>Quantity:</strong> {material.quantity} <br />
               <strong>Unit:</strong> {material.unit} <br />
-              <img src={`http://localhost:8080/uploads/${material.image}`} alt={material.description} style={styles.materialImage} />
+              {/* Update the image source to use the correct URL */}
+              <div className="md:flex-shrink-0">
+              <img 
+                  className="h-64 w-full object-cover md:w-64" 
+                  src={`http://localhost:8080/${material.image.replace('\\', '/')}`} // Replace backslash with forward slash
+                  alt={material.description} 
+                  style={styles.materialImage} 
+                />
+              </div>
             </div>
             <button onClick={() => handleDeleteMaterial(material._id)} style={styles.deleteButton}>Delete</button>
           </li>
@@ -362,6 +382,10 @@ const styles = {
     border: 'none',
     borderRadius: '5px',
     cursor: 'pointer',
+  },
+  materialImage: {
+    maxWidth: '100px', // Set a max width for the material image
+    height: 'auto', // Maintain aspect ratio
   },
 };
 
