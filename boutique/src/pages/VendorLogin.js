@@ -4,6 +4,8 @@ import axios from 'axios';
 import { useNavigate, Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
+import logo from '../assets/logo.png';
+import backgroundImage from '../assets/loginimage.avif'; // Adjust
 
 const VendorLogin = () => {
   const [email, setEmail] = useState('');
@@ -20,6 +22,10 @@ const VendorLogin = () => {
 
   const validatePassword = (password) => {
     return password.length >= 6; // Example: minimum password length
+  };
+
+  const validateGSTIN = (gstin) => {
+    return /^IN[a-zA-Z0-9]{13}$/.test(gstin); // Validate GSTIN format
   };
 
   const handleChangeEmail = (e) => {
@@ -69,9 +75,22 @@ const VendorLogin = () => {
       {/* Header Section */}
       <header style={styles.header}>
         <div className='container mx-auto flex items-center justify-between px-4 h-full'>
-          <Link to="/" className='text-green text-3xl font-bold hover:text-pink-100 transition-colors duration-300'>
-            Tailor's Touch Boutique
-          </Link>
+          {/* Logo Section */}
+          <div className='flex items-center'>
+            <Link to="/">
+              <img src={logo} alt="Tailor's Touch Logo" className="h-12 mr-4" />
+            </Link>
+            <Link to="/" style={styles.boutiqueName}>
+              Tailor's Touch Boutique
+            </Link>
+          </div>
+          {/* Back Button */}
+          <button 
+            onClick={() => navigate(-1)} 
+            className='text-white bg-blue-500 px-4 py-2 rounded hover:bg-blue-600 ml-auto' // ml-auto pushes the button to the right
+          >
+            Back
+          </button>
         </div>
       </header>
 
@@ -108,7 +127,8 @@ const VendorLogin = () => {
           {successMessage && <p style={styles.success}>{successMessage}</p>}
           <button type="submit" style={styles.button}>Login</button>
           <p style={styles.footerText}>
-            Don't have an account? <Link to="/vendor-register" style={styles.link}>Register here</Link>
+            <span style={styles.linkText}>Don't have an account? </span>
+            <Link to="/vendor-register" style={styles.link}>Register here</Link>
           </p>
         </form>
       </div>
@@ -127,20 +147,29 @@ const styles = {
   page: {
     paddingTop: '80px', // To account for the fixed header height
     paddingBottom: '40px', // To provide space for the footer
-    backgroundColor: '#f4f4f4', // Solid background color
+    backgroundImage: `url(${backgroundImage})`, // Set background image
+    backgroundSize: 'cover', // Cover the entire page
+    backgroundPosition: 'center', // Center the background image
+    color: '#fff', // Set text color to white for better contrast
   },
   header: {
     position: 'fixed',
     top: 0,
     left: 0,
     right: 0,
-    height: '80px',
-    backgroundColor: '#fbbf24', // Header background color (yellow)
+    height: '80px', // Set height for the header
+    backgroundColor: 'rgba(255, 255, 255, 1)', // Fully opaque background
     zIndex: 1000,
-    boxShadow: '0 2px 5px rgba(0, 0, 0, 0.1)', // Add shadow for depth
+    boxShadow: '0 2px 5px rgba(0, 0, 0, 0.1)',
+  },
+  boutiqueName: {
+    color: 'black', // Set text color to black for visibility
+    fontSize: '24px', // Adjust font size as needed
+    fontWeight: 'bold', // Make the text bold
+    textDecoration: 'none', // Remove underline from the link
   },
   formContainer: {
-    backgroundColor: 'white',
+    backgroundColor: 'rgba(255, 255, 255, 0.9)', // Semi-transparent white for the form
     padding: '30px', // Increased padding for the form
     borderRadius: '10px',
     textAlign: 'center',
@@ -159,6 +188,7 @@ const styles = {
     marginBottom: '10px',
     fontSize: '16px',
     fontWeight: 'bold',
+    color: 'black', // Set label text color to black
   },
   input: {
     width: '100%',
@@ -188,7 +218,6 @@ const styles = {
     fontSize: '16px',
     cursor: 'pointer',
     marginTop: '20px',
-    transition: 'background-color 0.3s',
   },
   error: {
     color: 'red',
@@ -213,6 +242,9 @@ const styles = {
   link: {
     color: '#007bff',
     textDecoration: 'none',
+  },
+  linkText: {
+    color: 'black', // Set link text color to black
   },
 };
 

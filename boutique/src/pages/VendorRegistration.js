@@ -4,6 +4,7 @@ import axios from 'axios';
 import { useNavigate, Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
+import logo from '../assets/logo.png';
 
 const VendorRegistration = () => {
   const [formData, setFormData] = useState({
@@ -68,9 +69,7 @@ const VendorRegistration = () => {
       case 'confirmPassword':
         validationErrors.confirmPassword = value === formData.password ? '' : 'Passwords do not match.';
         break;
-      case 'gstin':
-        validationErrors.gstin = /^[0-9]{2}[A-Z]{4}[0-9]{4}[Z][A-Z0-9]{1}$/.test(value) ? '' : 'Please enter a valid GSTIN.';
-        break;
+        
       case 'phoneNumber':
         validationErrors.phoneNumber = /^\d{10}$/.test(value) ? '' : 'Phone number must be 10 digits.';
         break;
@@ -88,7 +87,7 @@ const VendorRegistration = () => {
       email: '',
       password: '',
       confirmPassword: '',
-      gstin: '',
+    
       phoneNumber: '',
       termsAccepted: '',
     };
@@ -106,9 +105,8 @@ const VendorRegistration = () => {
     if (password !== confirmPassword) {
       validationErrors.confirmPassword = 'Passwords do not match.';
     }
-    if (!/^[0-9]{2}[A-Z]{4}[0-9]{4}[Z][A-Z0-9]{1}$/.test(gstin)) {
-      validationErrors.gstin = 'Please enter a valid GSTIN.';
-    }
+    
+    
     if (!/^\d{10}$/.test(phoneNumber)) {
       validationErrors.phoneNumber = 'Phone number must be 10 digits.';
     }
@@ -156,20 +154,32 @@ const VendorRegistration = () => {
       {/* Header Section */}
       <header style={styles.header}>
         <div className='container mx-auto flex items-center justify-between px-4 h-full'>
-          <Link to="/" className='text-green text-3xl font-bold hover:text-pink-100 transition-colors duration-300'>
-            Tailor's Touch Boutique
-          </Link>
-          <div>
-            <button onClick={handleLogin} className='text-white ml-4 bg-blue-500 px-4 py-2 rounded hover:bg-blue-600'>
-              Login
-            </button>
-            <button onClick={() => navigate(-1)} className='text-white ml-4 bg-blue-500 px-4 py-2 rounded hover:bg-blue-600'>
+          {/* Logo Section */}
+          <div className='flex items-center'>
+            <Link to="/">
+              <img src={logo} alt="Tailor's Touch Logo" className="h-12 mr-4" />
+            </Link>
+            <Link to="/" style={styles.boutiqueName}>
+              Tailor's Touch Boutique
+            </Link>
+          </div>
+          {/* Buttons Section */}
+          <div className='flex items-center'>
+            <button 
+              onClick={() => navigate(-1)} 
+              className='text-white bg-blue-500 px-4 py-2 rounded hover:bg-blue-600'
+            >
               Back
+            </button>
+            <button 
+              onClick={handleLogin} 
+              className='text-white bg-blue-500 px-4 py-2 rounded hover:bg-blue-600 ml-4'
+            >
+              Login
             </button>
           </div>
         </div>
       </header>
-
       {/* Registration Form */}
       <div style={styles.formContainer}>
         <h2 style={styles.title}>Vendor Registration</h2>
@@ -300,9 +310,16 @@ const styles = {
     top: 0,
     left: 0,
     right: 0,
-    height: '80px',
-    backgroundColor: '#fbbf24', // Header background color (yellow)
+    height: '80px', // Set height for the header
+    backgroundColor: 'rgba(255, 255, 255, 1)', // Fully opaque background
     zIndex: 1000,
+    boxShadow: '0 2px 5px rgba(0, 0, 0, 0.1)',
+  },
+  boutiqueName: {
+    color: 'black', // Set text color to black for visibility
+    fontSize: '24px', // Adjust font size as needed
+    fontWeight: 'bold', // Make the text bold
+    textDecoration: 'none', // Remove underline from the link
   },
   formContainer: {
     backgroundColor: 'white',

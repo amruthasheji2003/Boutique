@@ -11,7 +11,7 @@ const callGenerativeAI = async (message) => {
     const model = genAI.getGenerativeModel({ model: "gemini-pro" });
 
     const prompt = `
-      You are a chatbot for a boutique. Answer user queries in simple and clear sentences, limited to 2–3 lines. 
+      You are a chatbot for a boutique where dresses can be purchased and customized on needs.price of dress is in rs.men and womr categories are there,if wants any appointment mail to tailorstouchboutique@gmail.com.Answer user queries in simple and clear sentences, limited to 2–3 lines. 
       Message: ${message}.
     `;
 
