@@ -25,11 +25,12 @@ import EditProduct from '../pages/EditProduct';
 import ProductDetails from '../pages/ProductDetails';
 import AboutUs from '../pages/AboutUs';
 import ProductInfo from '../pages/ProductInfo';
-import CustomizationForm from '../pages/CustomizationForm';
 import Checkout from '../pages/Checkout';
 import VendorRegistration from '../pages/VendorRegistration';
 import VendorLogin from '../pages/VendorLogin';
 import VendorDashboard from '../pages/VendorDashboard';
+import Customization from '../pages/Customization';
+
 
 const router = createBrowserRouter([
     {
@@ -53,11 +54,11 @@ const router = createBrowserRouter([
             { path: "manage-products/:id", element: <ManageProducts /> },
             { path: "about-us", element: <AboutUs /> },
             { path: "product-info/:id", element: <ProductInfo /> },
-            { path: "customize/:id", element: <CustomizationForm /> },
             { path: "checkout", element: <Checkout /> },
             { path: "vendor-register", element: <VendorRegistration /> },
             { path: "vendor-login", element: <VendorLogin /> },
             { path: "vendor-page", element: <VendorDashboard /> },
+            { path: "customize" , element: <Customization />},
            
             // Admin routes
             {

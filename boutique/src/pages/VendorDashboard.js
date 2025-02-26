@@ -67,20 +67,36 @@ const VendorDashboard = () => {
 
   const handleMaterialChange = (e) => {
     const { name, value } = e.target;
-    setNewMaterial((prev) => ({ ...prev, [name]: value }));
+    setNewMaterial((prev) => ({ ...prev, [name]: value }));fetchMaterials
 
-    // Immediate validation
-    if (name === 'price' || name === 'quantity' || name === 'stock') {
-      if (value <= 0) {
-        setError((prev) => ({ ...prev, [name]: `${name.charAt(0).toUpperCase() + name.slice(1)} must be greater than zero.` }));
-      } else {
-        setError((prev) => ({ ...prev, [name]: '' })); // Clear error if valid
-      }
+    // Immediate validation for all fields
+    let newError = { ...error };
+
+    if (name === 'price') {
+        if (value <= 0) {
+            newError.price = 'Price must be greater than zero.';
+        } else {
+            newError.price = ''; // Clear error if valid
+        }
+    } else if (name === 'stock') {
+        if (value <= 0 || value > 500) {
+            newError.stock = 'Stock must be greater than zero and less than or equal to 500.';
+        } else {
+            newError.stock = ''; // Clear error if valid
+        }
+    } else if (name === 'quantity') {
+        if (value <= 0 || value > 2500) {
+            newError.quantity = 'Quantity must be greater than zero and less than or equal to 2500.';
+        } else {
+            newError.quantity = ''; // Clear error if valid
+        }
     } else if (!value) {
-      setError((prev) => ({ ...prev, [name]: 'This field is required.' }));
+        newError[name] = 'This field is required.';
     } else {
-      setError((prev) => ({ ...prev, [name]: '' })); // Clear error if valid
+        newError[name] = ''; // Clear error if valid
     }
+
+    setError(newError); // Update error state
   };
 
   const handleImageChange = (e) => {
@@ -99,25 +115,26 @@ const VendorDashboard = () => {
     const newError = { ...error };
 
     if (!newMaterial.category) {
-      newError.category = 'This field is required.';
-      valid = false;
+        newError.category = 'This field is required.';
+        valid = false;
     }
     if (!newMaterial.description) {
-      newError.description = 'This field is required.';
-      valid = false;
+        newError.description = 'This field is required.';
+        valid = false;
     }
     if (newMaterial.price <= 0) {
-      newError.price = 'Price must be greater than zero.';
-      valid = false;
+        newError.price = 'Price must be greater than zero.';
+        valid = false;
     }
-    if (newMaterial.stock <= 0) {
-      newError.stock = 'Stock must be greater than zero.';
-      valid = false;
+    if (newMaterial.stock <= 0 || newMaterial.stock > 500) {
+        newError.stock = 'Stock must be greater than zero and less than or equal to 500.';
+        valid = false;
     }
-    if (newMaterial.quantity <= 0) {
-      newError.quantity = 'Quantity must be greater than zero.';
-      valid = false;
+    if (newMaterial.quantity <= 0 || newMaterial.quantity > 2500) {
+        newError.quantity = 'Quantity must be greater than zero and less than or equal to 2500.';
+        valid = false;
     }
+    
     if (!newMaterial.unit) {
       newError.unit = 'This field is required.';
       valid = false;

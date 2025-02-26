@@ -28,6 +28,8 @@ const BrowseCatalog = () => {
   const [cartItems, setCartItems] = useState([]); // Add this line
   const [wishlistItems, setWishlistItems] = useState([]); // Add this line
   const [userName, setUserName] = useState(''); // State for user name
+  const [isClicked, setIsClicked] = useState(false); // State to track button click
+
 
 
   const navigate = useNavigate();
@@ -291,6 +293,7 @@ const BrowseCatalog = () => {
               className="w-full py-2 px-3 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-pink-500"
             />
           </div>
+          
           <nav className="flex items-center space-x-6">
           <p className="text-gray-700">Welcome, {userName}!</p> {/* Display user name */}
             <Link to="/" className='text-gray-700 hover:text-pink-500 transition-colors duration-300'>Home</Link>
@@ -315,6 +318,16 @@ const BrowseCatalog = () => {
               )}
             </Link>
             <button 
+          onClick={() => {
+            setIsClicked(true); // Set the button clicked state
+            navigate('/customize'); // Navigate to customization page
+          }} 
+          className={`bg-white ${isClicked ? 'text-black' : 'text-black'} px-4 py-2 rounded hover:bg-gray-300 transition duration-300`}
+        >
+          Customize
+        </button>            
+           
+            <button 
             onClick={handleGoBack}
             className="text-gray-600 hover:text-gray-900 transition-colors duration-300 flex items-center"
           >
@@ -331,11 +344,7 @@ const BrowseCatalog = () => {
           </nav>
           
         </div>
-        
-        
-      </header>
-      
-
+      </header>   
       <main className="flex-grow container mx-auto px-4 pt-20 pb-8"> 
         <div className="mb-6 flex flex-wrap items-center">
           <div className="w-full md:w-1/4 mb-4 md:mb-0">
