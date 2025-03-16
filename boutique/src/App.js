@@ -5,6 +5,7 @@ import { Outlet } from 'react-router-dom'; // Use Outlet for nested routes
 import Footer from './components/Footer';
 import WhatsAppButton from './components/WhatsAppButton';
 import Chatbot from './components/Chatbot';
+
 // import Header from './components/Header'; // Uncomment if you have a Header component
 
 function App() {

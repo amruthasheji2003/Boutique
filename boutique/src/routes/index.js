@@ -25,12 +25,13 @@ import EditProduct from '../pages/EditProduct';
 import ProductDetails from '../pages/ProductDetails';
 import AboutUs from '../pages/AboutUs';
 import ProductInfo from '../pages/ProductInfo';
-import Checkout from '../pages/Checkout';
 import VendorRegistration from '../pages/VendorRegistration';
 import VendorLogin from '../pages/VendorLogin';
 import VendorDashboard from '../pages/VendorDashboard';
 import Customization from '../pages/Customization';
-
+import Payment from '../pages/Payment';
+import OrderSuccess from '../pages/OrderSuccess';
+import Orders from '../pages/Orders';
 
 const router = createBrowserRouter([
     {
@@ -54,12 +55,14 @@ const router = createBrowserRouter([
             { path: "manage-products/:id", element: <ManageProducts /> },
             { path: "about-us", element: <AboutUs /> },
             { path: "product-info/:id", element: <ProductInfo /> },
-            { path: "checkout", element: <Checkout /> },
+            { path: "checkout", element: <Payment /> },
             { path: "vendor-register", element: <VendorRegistration /> },
             { path: "vendor-login", element: <VendorLogin /> },
             { path: "vendor-page", element: <VendorDashboard /> },
             { path: "customize" , element: <Customization />},
-           
+            { path: "order-success", element: <OrderSuccess /> },
+            { path: "orders", element: <Orders /> },
+
             // Admin routes
             {
                 path: "admin",

@@ -337,7 +337,7 @@ const Customization = () => {
         </div>
 
         <div className="mb-4">
-          <h2 className="text-lg font-bold mb-2">Total Price: ${totalPrice.toFixed(2)}</h2> {/* Display total price */}
+          <h2 className="text-lg font-bold mb-2">Total Price: Rs.{totalPrice.toFixed(2)}</h2> {/* Display total price */}
         </div>
 
         <button
@@ -348,13 +348,12 @@ const Customization = () => {
         </button>
 
         {showPlaceOrder && (
-          <button
-            type="button"
-            onClick={handlePlaceOrder}
-            className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition duration-300 mt-4"
-          >
-            Place Order
-          </button>
+         <button
+         onClick={() => navigate('/checkout')} // Navigate to the checkout page
+         className="mt-4 text-blue-500 hover:underline"
+       >
+         Place Order
+       </button>
         )}
       </form>
       <button

@@ -104,6 +104,32 @@ function Cart() {
     navigate(-1);
   };
 
+  const handleBuyNow = (item) => {
+    const buyNowItem = {
+      _id: item.product._id,
+      name: item.product.name,
+      price: item.price,
+      quantity: item.quantity
+    };
+    navigate('/checkout', { state: { buyNowItem } });
+  };
+
+  const handleBuyAllItems = () => {
+    const buyNowItem = {
+      _id: 'cart',
+      name: 'Cart Items',
+      items: cart.items.map(item => ({
+        _id: item.product._id,
+        name: item.product.name,
+        price: item.price,
+        quantity: item.quantity
+      })),
+      price: cart.items.reduce((total, item) => total + (item.price * item.quantity), 0),
+      quantity: 1
+    };
+    navigate('/checkout', { state: { buyNowItem } });
+  };
+
   if (loading) return <div className="container mx-auto p-4">Loading...</div>;
   if (error) return <div className="container mx-auto p-4 text-red-500">{error}</div>;
 
@@ -200,26 +226,40 @@ function Cart() {
                       </button>
                     </div>
                   </div>
-                  <button 
-                    onClick={() => removeFromCart(item.product._id)}
-                    className="ml-4 text-red-500 hover:text-red-700 transition-colors duration-300"
-                  >
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                    </svg>
-                  </button>
+                  <div className="flex flex-col space-y-2 ml-4">
+                    <button 
+                      onClick={() => handleBuyNow(item)}
+                      className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition-colors duration-300"
+                    >
+                      Buy Now
+                    </button>
+                    <button 
+                      onClick={() => removeFromCart(item.product._id)}
+                      className="text-red-500 hover:text-red-700 transition-colors duration-300"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                      </svg>
+                    </button>
+                  </div>
                 </div>
               ) : null
             ))}
             <div className="mt-6 text-right text-xl font-bold">
               Total: Rs.{cart.items.reduce((total, item) => total + (item.price || 0) * (item.quantity || 0), 0).toFixed(2)}
             </div>
-            <div className="flex justify-end mt-4">
+            <div className="flex justify-end space-x-4 mt-4">
               <button 
                 onClick={clearCart}
                 className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition-colors duration-300"
               >
                 Clear Cart
+              </button>
+              <button 
+                onClick={handleBuyAllItems}
+                className="bg-green-500 text-white px-6 py-2 rounded hover:bg-green-600 transition-colors duration-300"
+              >
+                Buy All Items
               </button>
             </div>
           </div>

@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import ProductRecommendations from './ProductRecommendations';
+
 
 const API_URL = 'http://localhost:8080';
 
@@ -9,6 +11,7 @@ const ProductInfo = () => {
   const navigate = useNavigate();
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
+ // State for recommendations
   const [error, setError] = useState(null);
   const [selectedBatch, setSelectedBatch] = useState(() => {
     const saved = localStorage.getItem(`selectedBatch_${id}`);
@@ -57,6 +60,7 @@ const ProductInfo = () => {
         setLoading(false);
       }
     };
+    
 
     fetchProduct();
   }, [id, selectedBatch]);
@@ -206,9 +210,14 @@ const ProductInfo = () => {
     }, 3000);
   };
 
-  const handleBuyNow = async () => {
-    await handleAddToCart();
-    navigate('/checkout');
+  const handleBuyNow = () => {
+    const buyNowItem = {
+      _id: product._id,
+      name: product.name,
+      price: selectedBatch.finalPrice,
+      quantity: quantity
+    };
+    navigate('/checkout', { state: { buyNowItem } });
   };
 
   if (loading) return <div className="text-center py-8">Loading...</div>;
@@ -352,6 +361,9 @@ const ProductInfo = () => {
           )}
         </div>
       </div>
+      {/* Integrate the ProductRecommendations component */}
+      <ProductRecommendations currentProduct={product} />
+
       {cartMessage && (
         <div className={`mt-4 p-2 rounded ${cartMessage.type === 'success' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
           {cartMessage.text}

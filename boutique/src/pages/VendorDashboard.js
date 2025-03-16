@@ -67,7 +67,7 @@ const VendorDashboard = () => {
 
   const handleMaterialChange = (e) => {
     const { name, value } = e.target;
-    setNewMaterial((prev) => ({ ...prev, [name]: value }));fetchMaterials
+    setNewMaterial((prev) => ({ ...prev, [name]: value }));
 
     // Immediate validation for all fields
     let newError = { ...error };

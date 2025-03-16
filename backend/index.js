@@ -19,6 +19,8 @@ const customizationRoutes = require('./routes/customizationRoutes');
 const vendorRoutes = require('./routes/vendorRoutes');
 const materialRoutes = require('./routes/materialRoutes');
 const chatbotRoutes = require('./routes/chatbotRoutes');
+const paymentRoutes = require('./routes/paymentRoutes');
+const orderRoutes = require('./routes/orderRoutes');
 
 // Initialize Express app
 const app = express();
@@ -29,10 +31,23 @@ const PORT = process.env.PORT || 8080;
 // MongoDB connection URI (from .env)
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/yourdbname';
 
-// Middleware for Cross-Origin Resource Sharing (CORS)
+// Enhanced CORS configuration
 app.use(cors({
-  origin: 'http://localhost:3000', // Replace with your frontend URL
+  origin: true, // Allow all origins in development
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin'],
 }));
+
+// Add headers middleware for additional CORS support
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Credentials', 'true');
+  res.header('Access-Control-Allow-Origin', req.headers.origin);
+  res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,PATCH,OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
+  next();
+});
+
 // Middleware to parse JSON and URL-encoded data
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -58,13 +73,8 @@ app.use('/api/customizations',customizationRoutes);
 app.use('/api/vendors', vendorRoutes);
 app.use('/api/materials',materialRoutes);
 app.use('/api', chatbotRoutes);
-
-
-
-
-
-
-
+app.use('/api/payment', paymentRoutes);
+app.use('/api/orders', orderRoutes);
 
 // Serve static files (uploads)
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
@@ -73,7 +83,6 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.get('/', (req, res) => {
   res.send('Server is running');
 });
-
 
 // Centralized error handling middleware
 app.use((err, req, res, next) => {
